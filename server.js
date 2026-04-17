@@ -3,11 +3,10 @@ const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
 const session = require('express-session');
-const https = require('https');
 const app = express();
 
 // Middleware setup
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -51,28 +50,28 @@ app.get('/', (req, res) => {
         if (t === 'a') return res.redirect('/admin');
         return res.redirect('/dashboard');
     }
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'public/pages/index.html'));
 });
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
-app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public/pages/login.html')));
+app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public/pages/register.html')));
 
 // Patient pages
-app.get('/dashboard', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'dashboard.html')));
-app.get('/book', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'book.html')));
-app.get('/doctors', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'doctors.html')));
-app.get('/mybookings', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'mybookings.html')));
-app.get('/results', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'results.html')));
-app.get('/healthrecord', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'healthrecord.html')));
-app.get('/settings', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'settings.html')));
+app.get('/dashboard', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/dashboard.html')));
+app.get('/book', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/book.html')));
+app.get('/doctors', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/doctors.html')));
+app.get('/mybookings', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/mybookings.html')));
+app.get('/results', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/results.html')));
+app.get('/healthrecord', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/healthrecord.html')));
+app.get('/settings', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/settings.html')));
 
 // Doctor pages
-app.get('/doctor', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'doctor.html')));
-app.get('/mypatients', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'mypatients.html')));
-app.get('/addresult', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'addresult.html')));
-app.get('/doctorsettings', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'doctorsettings.html')));
+app.get('/doctor', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/doctor.html')));
+app.get('/mypatients', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/mypatients.html')));
+app.get('/addresult', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/addresult.html')));
+app.get('/doctorsettings', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/doctorsettings.html')));
 
 // Admin page
-app.get('/admin', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
+app.get('/admin', requireLogin, (req, res) => res.sendFile(path.join(__dirname, 'public/pages/admin.html')));
 
 // =====================
 // PATIENT APIs
