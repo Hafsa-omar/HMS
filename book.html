@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Book Appointment</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .book-card { background:white; border-radius:12px; padding:22px 25px; margin-bottom:18px; box-shadow:0 2px 10px rgba(0,0,0,0.07); }
+        .step-label { font-size:0.72rem; font-weight:800; color:#007bff; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+        .step-num { background:#007bff; color:white; border-radius:50%; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:800; flex-shrink:0; }
+        .step-label.done .step-num { background:#28a745; }
+        .form-select { width:100%; padding:12px 14px; border:1.5px solid #dde3ea; border-radius:8px; font-size:0.95rem; background:white; cursor:pointer; transition:0.2s; }
+        .form-select:focus { outline:none; border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.12); }
+
+        /* Pill toggle buttons */
+        .pill-group { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+        .pill-btn { padding:8px 18px; border:2px solid #dde3ea; background:white; border-radius:25px; cursor:pointer; font-size:0.83rem; font-weight:700; color:#555; transition:0.2s; }
+        .pill-btn:hover { border-color:#007bff; color:#007bff; }
+        .pill-btn.active { border-color:#007bff; background:#007bff; color:white; }
+        .pill-btn.pub.active  { border-color:#27ae60; background:#27ae60; }
+        .pill-btn.priv.active { border-color:#e74c3c; background:#e74c3c; }
+        .pill-btn.ins-yes.active { border-color:#27ae60; background:#27ae60; }
+        .pill-btn.ins-no.active  { border-color:#888; background:#888; }
+
+        /* Country flag chips */
+        .country-chip { padding:6px 14px; border:2px solid #dde3ea; background:white; border-radius:20px; cursor:pointer; font-size:0.8rem; font-weight:700; color:#444; transition:0.2s; }
+        .country-chip:hover { border-color:#007bff; }
+        .country-chip.active { border-color:#007bff; background:#007bff; color:white; }
+
+        /* Insurance % selector */
+        .ins-level { display:none; margin-top:12px; padding:12px; background:#f0f9f4; border-radius:8px; border:1px solid #c3e6cb; }
+        .ins-level label { font-size:0.8rem; font-weight:700; color:#155724; display:block; margin-bottom:8px; }
+        .ins-level select { padding:8px 12px; border:1px solid #c3e6cb; border-radius:6px; font-size:0.88rem; background:white; }
+
+        /* Doctor cards */
+        .doctor-cards-list { display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto; padding-right:2px; }
+        .doctor-card { border:2px solid #e8edf3; border-radius:10px; padding:13px 15px; cursor:pointer; transition:all 0.2s; background:white; }
+        .doctor-card:hover { border-color:#007bff; background:#f5f9ff; }
+        .doctor-card.selected { border-color:#007bff; background:#e7f1ff; box-shadow:0 0 0 3px rgba(0,123,255,0.15); }
+        .doctor-card.unavail { opacity:0.55; }
+        .doc-avatar { width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; color:white; font-weight:800; }
+        .stars { color:#f39c12; font-size:0.8rem; letter-spacing:1px; }
+        .type-badge { font-size:0.68rem; font-weight:800; padding:2px 8px; border-radius:10px; display:inline-block; }
+        .badge-pub  { background:#d4edda; color:#155724; }
+        .badge-priv { background:#fde8e8; color:#721c24; }
+        .avail-dot  { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+        /* Cost box */
+        .cost-box { background:#f8f9fa; border-radius:10px; padding:14px; margin-top:14px; font-size:0.85rem; }
+        .cost-row  { display:flex; justify-content:space-between; padding:5px 0; color:#555; }
+        .cost-row.total { border-top:2px solid #0a3d62; margin-top:6px; padding-top:10px; font-weight:800; font-size:1rem; color:#0a3d62; }
+        .cost-discount { color:#28a745; }
+
+        /* Health share toggle */
+        .share-toggle { display:flex; align-items:center; gap:12px; padding:14px; background:#fff8e1; border-radius:10px; border:1.5px solid #ffc107; cursor:pointer; margin-top:10px; }
+        .share-toggle input[type=checkbox] { width:18px; height:18px; cursor:pointer; accent-color:#007bff; }
+
+        /* Date input */
+        .date-input { width:100%; padding:12px 14px; border:1.5px solid #dde3ea; border-radius:8px; font-size:0.95rem; box-sizing:border-box; transition:0.2s; }
+        .date-input:focus { outline:none; border-color:#007bff; }
+
+        .back-btn { display:inline-flex; align-items:center; gap:8px; background:white; border:2px solid #e0e0e0; color:#555; padding:9px 18px; border-radius:10px; cursor:pointer; font-weight:600; font-size:0.88rem; margin-bottom:18px; transition:0.2s; }
+        .back-btn:hover { border-color:#007bff; color:#007bff; }
+
+        /* Collapsed steps */
+        .step-body { margin-top:12px; }
+
+        @media print { .sidebar,.back-btn,.chat-btn,.chat-window { display:none!important; } .main-content { margin-left:0!important; } }
+    </style>
+</head>
+<body class="dashboard-body">
+
+<div class="sidebar">
+    <div class="logo" style="margin-bottom:30px; text-align:center;">
+            <img src="/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+        </div>
+    <nav style="display:flex; flex-direction:column; gap:15px;">
+        <a href="/dashboard" class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="/book" class="btn-nav dark" style="justify-content:flex-start; background:#e7f1ff; color:#007bff;"><i class="fas fa-calendar-plus"></i> Book Appointment</a>
+        <a href="/doctors" class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-user-md"></i> All Doctors</a>
+        <a href="/mybookings" class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-list"></i> My Bookings</a>
+        <a href="/results" class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-flask"></i> Lab Results</a>
+        <a href="/settings" class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-cog"></i> Settings</a>
+        <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+        <a href="/logout" class="btn-nav dark" style="justify-content:flex-start; color:#dc3545;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+</div>
+
+<div class="main-content">
+    <button onclick="history.back()" class="back-btn"><i class="fas fa-arrow-left"></i> Go Back</button>
+
+    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:22px;">
+        <div>
+            <h1 style="font-size:1.7rem;"><i class="fas fa-calendar-plus" style="color:#007bff;"></i> Book Appointment</h1>
+            <p style="color:#666;">Global healthcare — find the right doctor, anywhere</p>
+        </div>
+        <button onclick="location.href='/doctors'" style="background:white; color:#007bff; border:2px solid #007bff; padding:9px 18px; border-radius:10px; cursor:pointer; font-weight:600; font-size:0.88rem;">
+            <i class="fas fa-user-md"></i> Browse All Doctors
+        </button>
+    </header>
+
+    <div style="display:flex; gap:22px; align-items:flex-start; flex-wrap:wrap;">
+
+        <!-- ═══════════════ LEFT: STEPS ═══════════════ -->
+        <div style="flex:1; min-width:320px;">
+
+            <!-- STEP 1: Location -->
+            <div class="book-card">
+                <div class="step-label" id="lbl-1"><span class="step-num">1</span> Where are you? — Choose Country &amp; City</div>
+                <div class="step-body">
+                    <div style="margin-bottom:12px;">
+                        <p style="font-size:0.78rem; color:#888; font-weight:700; margin-bottom:8px;">COUNTRY</p>
+                        <div class="pill-group" id="country-pills">
+                            <button class="pill-btn active" onclick="setCountry('',this)">🌍 All</button>
+                            <button class="pill-btn" onclick="setCountry('Turkey',this)">🇹🇷 Turkey</button>
+                            <button class="pill-btn" onclick="setCountry('UAE',this)">🇦🇪 UAE</button>
+                            <button class="pill-btn" onclick="setCountry('UK',this)">🇬🇧 UK</button>
+                            <button class="pill-btn" onclick="setCountry('Germany',this)">🇩🇪 Germany</button>
+                            <button class="pill-btn" onclick="setCountry('USA',this)">🇺🇸 USA</button>
+                            <button class="pill-btn" onclick="setCountry('France',this)">🇫🇷 France</button>
+                        </div>
+                    </div>
+                    <div>
+                        <p style="font-size:0.78rem; color:#888; font-weight:700; margin-bottom:8px;">CITY / REGION</p>
+                        <select class="form-select" id="citySelect" onchange="onCityChange()">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: Hospital Type -->
+            <div class="book-card">
+                <div class="step-label" id="lbl-2"><span class="step-num">2</span> Hospital Type</div>
+                <div class="step-body">
+                    <div class="pill-group" id="type-pills">
+                        <button class="pill-btn active" onclick="setType('',this)">🏥 All</button>
+                        <button class="pill-btn pub"  onclick="setType('public',this)">🏥 Public</button>
+                        <button class="pill-btn priv" onclick="setType('private',this)">🏨 Private</button>
+                    </div>
+                    <div style="margin-top:12px; font-size:0.78rem; color:#888; line-height:1.7;">
+                        <span style="color:#27ae60; font-weight:700;">Public:</span> lower fees, government-run &nbsp;|&nbsp;
+                        <span style="color:#e74c3c; font-weight:700;">Private:</span> premium care, higher fees
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: Specialty -->
+            <div class="book-card">
+                <div class="step-label" id="lbl-3"><span class="step-num">3</span> Medical Specialty</div>
+                <div class="step-body">
+                    <select class="form-select" id="specialtySelect" onchange="loadDoctors()">
+                        <option value="">-- Select Specialty --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- STEP 4: Insurance -->
+            <div class="book-card">
+                <div class="step-label" id="lbl-4"><span class="step-num">4</span> Do You Have Insurance?</div>
+                <div class="step-body">
+                    <div class="pill-group" id="ins-pills">
+                        <button class="pill-btn ins-no active" onclick="setInsurance(false,this)">❌ No Insurance</button>
+                        <button class="pill-btn ins-yes" onclick="setInsurance(true,this)">✅ Yes, I Have Insurance</button>
+                    </div>
+                    <div class="ins-level" id="ins-level-box">
+                        <label><i class="fas fa-shield-alt" style="color:#27ae60;"></i> Insurance Coverage Level:</label>
+                        <select id="insPercent" onchange="updateSummary()">
+                            <option value="20">Basic — 20% covered</option>
+                            <option value="40">Standard — 40% covered</option>
+                            <option value="60" selected>Silver — 60% covered</option>
+                            <option value="80">Gold — 80% covered</option>
+                            <option value="100">Full — 100% covered</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 5: Choose Doctor -->
+            <div class="book-card">
+                <div class="step-label" id="lbl-5"><span class="step-num">5</span> Choose Your Doctor</div>
+                <div class="step-body">
+                    <div id="doctor-cards" class="doctor-cards-list">
+                        <p style="color:#aaa; text-align:center; padding:20px 0; font-size:0.9rem;">
+                            Complete steps 1–3 to see available doctors
+                        </p>
+                    </div>
+                    <input type="hidden" id="doctorSelect" value="">
+                </div>
+            </div>
+
+            <!-- STEP 6: Date + Health File -->
+            <div class="book-card">
+                <div class="step-label" id="lbl-6"><span class="step-num">6</span> Date &amp; Health File</div>
+                <div class="step-body">
+                    <p style="font-size:0.78rem; color:#888; font-weight:700; margin-bottom:8px;">PREFERRED DATE</p>
+                    <input type="date" class="date-input" id="appointmentDate" onchange="updateSummary()" min="">
+
+                    <!-- Health File Share -->
+                    <label class="share-toggle" id="shareToggle">
+                        <input type="checkbox" id="shareFile" onchange="toggleHealthShare()">
+                        <div>
+                            <div style="font-weight:700; font-size:0.88rem; color:#555;">
+                                <i class="fas fa-folder-open" style="color:#ffc107;"></i>
+                                Share my Health File with this doctor
+                            </div>
+                            <div style="font-size:0.75rem; color:#888; margin-top:3px;">
+                                Doctor will see your medical history, past results &amp; appointments
+                            </div>
+                        </div>
+                        <span id="share-status" style="margin-left:auto; font-size:0.75rem; font-weight:700; color:#888;">OFF</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Confirm Button -->
+            <button onclick="bookAppointment()"
+                style="background:#007bff; color:white; border:none; padding:17px;
+                       border-radius:12px; cursor:pointer; font-weight:800;
+                       width:100%; font-size:1rem; transition:0.3s; letter-spacing:0.5px;">
+                <i class="fas fa-calendar-check"></i> &nbsp;Confirm Booking
+            </button>
+            <div id="result-msg" style="margin-top:18px;"></div>
+        </div>
+
+        <!-- ═══════════════ RIGHT: SUMMARY ═══════════════ -->
+        <div style="width:300px; flex-shrink:0;">
+
+            <!-- Booking Summary -->
+            <div class="book-card">
+                <h3 style="font-size:0.95rem; font-weight:800; margin-bottom:18px; color:#0a3d62;">
+                    <i class="fas fa-receipt" style="color:#007bff;"></i> Booking Summary
+                </h3>
+                <div id="summary-box">
+                    <div style="text-align:center; padding:20px 0;">
+                        <i class="fas fa-calendar-alt" style="font-size:2.5rem; color:#ddd;"></i>
+                        <p style="color:#aaa; font-size:0.85rem; margin-top:10px;">Complete the steps to see your summary</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Network -->
+            <div class="book-card" style="background:linear-gradient(135deg,#0a3d62,#007bff); color:white; border:none;">
+                <h3 style="color:white; margin-bottom:10px; font-size:0.92rem;">
+                    <i class="fas fa-globe-americas"></i> HMS Global Network
+                </h3>
+                <p style="font-size:0.8rem; opacity:0.9; line-height:1.7;">
+                    Your medical records travel with you. Switch doctor or hospital in any country — same system, same history.
+                </p>
+                <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px; font-size:0.72rem;">
+                    <span style="background:rgba(255,255,255,0.15); padding:3px 9px; border-radius:10px;">🇹🇷 Turkey</span>
+                    <span style="background:rgba(255,255,255,0.15); padding:3px 9px; border-radius:10px;">🇦🇪 UAE</span>
+                    <span style="background:rgba(255,255,255,0.15); padding:3px 9px; border-radius:10px;">🇬🇧 UK</span>
+                    <span style="background:rgba(255,255,255,0.15); padding:3px 9px; border-radius:10px;">🇩🇪 Germany</span>
+                    <span style="background:rgba(255,255,255,0.15); padding:3px 9px; border-radius:10px;">🇺🇸 USA</span>
+                    <span style="background:rgba(255,255,255,0.15); padding:3px 9px; border-radius:10px;">🇫🇷 France</span>
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="book-card">
+                <h3 style="font-size:0.88rem; margin-bottom:12px;"><i class="fas fa-lightbulb" style="color:#ffc107;"></i> Tips</h3>
+                <div style="font-size:0.82rem; color:#666; line-height:2;">
+                    <p>✅ Book at least 24 hrs in advance</p>
+                    <p>✅ Bring your medical records</p>
+                    <p>✅ Arrive 10 minutes early</p>
+                    <p>🛡️ Insurance reduces your cost</p>
+                    <p>⭐ Higher rated = more experienced</p>
+                    <p>📋 Share health file for better care</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="chat-btn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+<div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+        <span>🏥 HMS AI Assistant</span>
+        <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
+    </div>
+    <div class="chat-body" id="chatBody">
+        <div class="msg bot-msg">👋 Hi! I can help you choose the right doctor or specialty. What symptoms do you have?</div>
+    </div>
+    <div class="chat-footer">
+        <input type="text" id="chatInput" placeholder="Ask me anything...">
+        <button onclick="handleChat()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+
+<script src="chatbot.js"></script>
+<script>
+const countryFlags = { Turkey:'🇹🇷', UAE:'🇦🇪', UK:'🇬🇧', Germany:'🇩🇪', USA:'🇺🇸', France:'🇫🇷' };
+const citiesByCountry = {
+    '':       ['All Cities'],
+    Turkey:   ['All Cities','Ankara','Istanbul'],
+    UAE:      ['All Cities','Dubai','Abu Dhabi'],
+    UK:       ['All Cities','London'],
+    Germany:  ['All Cities','Berlin'],
+    USA:      ['All Cities','New York'],
+    France:   ['All Cities','Paris']
+};
+const avatarColors = ['#007bff','#e74c3c','#27ae60','#8e44ad','#e67e22','#16a085','#c0392b','#2980b9'];
+
+let selectedCountry = '';
+let selectedCity    = '';
+let selectedType    = '';
+let hasInsurance    = false;
+let insPercent      = 60;
+let allDoctors      = [];
+let selectedDoc     = null;
+let sharedDocIds    = [];
+
+window.onload = async function() {
+    document.getElementById('appointmentDate').min = new Date().toISOString().split('T')[0];
+    try {
+        const res = await fetch('/api/specialties');
+        const specs = await res.json();
+        const sel = document.getElementById('specialtySelect');
+        specs.forEach(s => {
+            const o = document.createElement('option');
+            o.value = s.id; o.textContent = s.sname;
+            sel.appendChild(o);
+        });
+    } catch(e) {}
+    // Load shared health files
+    try {
+        const r = await fetch('/api/health-sharing');
+        sharedDocIds = await r.json();
+    } catch(e) {}
+};
+
+function setCountry(c, btn) {
+    selectedCountry = c;
+    selectedCity = '';
+    document.querySelectorAll('#country-pills .pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Update city dropdown
+    const cities = citiesByCountry[c] || ['All Cities'];
+    const sel = document.getElementById('citySelect');
+    sel.innerHTML = cities.map(ci => `<option value="${ci === 'All Cities' ? '' : ci}">${ci}</option>`).join('');
+    loadDoctors();
+}
+
+function onCityChange() {
+    selectedCity = document.getElementById('citySelect').value;
+    loadDoctors();
+}
+
+function setType(t, btn) {
+    selectedType = t;
+    document.querySelectorAll('#type-pills .pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Re-filter existing doctors
+    renderDoctorCards(selectedType ? allDoctors.filter(d => d.hospital_type === selectedType) : allDoctors);
+    updateSummary();
+}
+
+function setInsurance(val, btn) {
+    hasInsurance = val;
+    document.querySelectorAll('#ins-pills .pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('ins-level-box').style.display = val ? 'block' : 'none';
+    updateSummary();
+}
+
+async function loadDoctors() {
+    const specId = document.getElementById('specialtySelect').value;
+    const cardsDiv = document.getElementById('doctor-cards');
+    if (!specId) {
+        cardsDiv.innerHTML = '<p style="color:#aaa;text-align:center;padding:20px;font-size:0.9rem;">Select a specialty to see doctors</p>';
+        return;
+    }
+    cardsDiv.innerHTML = '<p style="color:#aaa;text-align:center;padding:20px;">Loading doctors...</p>';
+    try {
+        let url = `/api/doctors/specialty/${specId}`;
+        const params = new URLSearchParams();
+        if (selectedCountry) params.set('country', selectedCountry);
+        if (selectedCity)    params.set('city', selectedCity);
+        if (params.toString()) url += '?' + params.toString();
+
+        const res = await fetch(url);
+        allDoctors = await res.json();
+        if (!Array.isArray(allDoctors)) allDoctors = [];
+
+        const filtered = selectedType ? allDoctors.filter(d => d.hospital_type === selectedType) : allDoctors;
+        renderDoctorCards(filtered);
+    } catch(e) {
+        cardsDiv.innerHTML = '<p style="color:red;text-align:center;padding:20px;">Error loading doctors. Please restart the server.</p>';
+    }
+}
+
+function stars(rating) {
+    const r = Math.round(rating * 2) / 2;
+    let s = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= r) s += '★';
+        else if (i - 0.5 === r) s += '½';
+        else s += '☆';
+    }
+    return s;
+}
+
+function renderDoctorCards(doctors) {
+    const cardsDiv = document.getElementById('doctor-cards');
+    if (!doctors || !doctors.length) {
+        cardsDiv.innerHTML = '<p style="color:#aaa;text-align:center;padding:20px;font-size:0.9rem;">No doctors found. Try changing filters.</p>';
+        return;
+    }
+    cardsDiv.innerHTML = doctors.map((d, i) => {
+        const country  = d.country  || 'Turkey';
+        const city     = d.city     || 'Ankara';
+        const hospital = d.hospital_branch || 'HMS Global';
+        const sname    = d.sname    || '';
+        const flag     = countryFlags[country] || '🌐';
+        const avail    = d.available ? '#27ae60' : '#dc3545';
+        const availTx  = d.available ? 'Available Now' : 'Unavailable';
+        const color    = avatarColors[i % avatarColors.length];
+        const initials = (d.docname||'Dr').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const typeLabel = d.hospital_type === 'private' ? 'Private' : 'Public';
+        const typeCls   = d.hospital_type === 'private' ? 'badge-priv' : 'badge-pub';
+        const fee       = d.consultation_fee || 50;
+        const rating    = d.rating || 4.0;
+        const revCount  = d.review_count || 0;
+        const safeName  = (d.docname||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+        const safeHosp  = hospital.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+        const safeSpc   = sname.replace(/'/g,"\\'");
+        return `
+        <div class="doctor-card${!d.available?' unavail':''}"
+             onclick="selectDoctor(${d.docid},'${safeName}','${safeSpc}','${country}','${city}','${safeHosp}','${d.hospital_type||'public'}',${fee},${rating},${revCount})"
+             id="doc-card-${d.docid}">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div class="doc-avatar" style="background:${color};">${initials}</div>
+                <div style="flex:1; min-width:0;">
+                    <div style="font-weight:700; font-size:0.9rem; color:#111;">${d.docname}
+                        <span class="type-badge ${typeCls}">${typeLabel}</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:#007bff;">${sname}</div>
+                    <div class="stars">${stars(rating)}</div>
+                    <div style="font-size:0.71rem; color:#888; margin-top:1px;">
+                        ${flag} ${city}, ${country} &nbsp;·&nbsp; ${revCount} reviews
+                    </div>
+                </div>
+                <div style="text-align:right; flex-shrink:0;">
+                    <div style="font-weight:800; color:#0a3d62; font-size:0.9rem;">$${fee}</div>
+                    <div style="font-size:0.68rem; color:#aaa;">per visit</div>
+                    <div class="avail-dot" style="background:${avail}; margin:5px auto 0;" title="${availTx}"></div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function selectDoctor(docid, docname, spec, country, city, hospital, htype, fee, rating, revCount) {
+    document.querySelectorAll('.doctor-card').forEach(c => c.classList.remove('selected'));
+    const card = document.getElementById('doc-card-' + docid);
+    if (card) card.classList.add('selected');
+    document.getElementById('doctorSelect').value = docid;
+    selectedDoc = { docid, docname, spec, country, city, hospital, htype, fee, rating, revCount };
+    // Pre-check share if already shared
+    document.getElementById('shareFile').checked = sharedDocIds.includes(docid);
+    document.getElementById('share-status').innerText = sharedDocIds.includes(docid) ? 'ON' : 'OFF';
+    updateSummary();
+}
+
+function updateSummary() {
+    const box  = document.getElementById('summary-box');
+    const date = document.getElementById('appointmentDate').value;
+    insPercent  = parseInt(document.getElementById('insPercent')?.value || 60);
+
+    if (!selectedDoc) {
+        box.innerHTML = `<div style="text-align:center;padding:20px 0;"><i class="fas fa-calendar-alt" style="font-size:2.5rem;color:#ddd;"></i><p style="color:#aaa;font-size:0.85rem;margin-top:10px;">Complete the steps to see your summary</p></div>`;
+        return;
+    }
+    const flag     = countryFlags[selectedDoc.country] || '🌐';
+    const typeBadge = selectedDoc.htype === 'private'
+        ? '<span style="background:#fde8e8;color:#721c24;padding:2px 8px;border-radius:8px;font-size:0.72rem;font-weight:800;">Private</span>'
+        : '<span style="background:#d4edda;color:#155724;padding:2px 8px;border-radius:8px;font-size:0.72rem;font-weight:800;">Public</span>';
+
+    const fee      = selectedDoc.fee;
+    const discount = hasInsurance ? Math.round(fee * insPercent / 100) : 0;
+    const youPay   = fee - discount;
+
+    box.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid #eee;margin-bottom:14px;">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#007bff,#0a3d62);display:flex;align-items:center;justify-content:center;color:white;font-size:1.1rem;flex-shrink:0;">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div>
+                <div style="font-weight:800;font-size:0.95rem;">${selectedDoc.docname}</div>
+                <div style="font-size:0.78rem;color:#007bff;">${selectedDoc.spec}</div>
+                <div class="stars" style="font-size:0.75rem;">${stars(selectedDoc.rating)}</div>
+            </div>
+        </div>
+        <div style="font-size:0.82rem;color:#555;line-height:2.1;">
+            <div>${flag} <b>${selectedDoc.city}, ${selectedDoc.country}</b></div>
+            <div><i class="fas fa-hospital" style="color:#007bff;width:16px;"></i> ${selectedDoc.hospital}</div>
+            <div>${typeBadge}</div>
+            <div><i class="fas fa-calendar" style="color:#007bff;width:16px;"></i> <b>${date || 'Not selected'}</b></div>
+        </div>
+        <div class="cost-box">
+            <div style="font-size:0.75rem;font-weight:800;color:#0a3d62;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Cost Breakdown</div>
+            <div class="cost-row">
+                <span>Consultation Fee</span>
+                <span>$${fee}</span>
+            </div>
+            ${hasInsurance ? `
+            <div class="cost-row cost-discount">
+                <span>Insurance (${insPercent}% off)</span>
+                <span>−$${discount}</span>
+            </div>` : `
+            <div class="cost-row" style="color:#aaa;font-size:0.78rem;">
+                <span>No insurance</span>
+                <span>—</span>
+            </div>`}
+            <div class="cost-row total">
+                <span>You Pay</span>
+                <span style="color:${youPay === 0 ? '#27ae60' : '#0a3d62'};">
+                    ${youPay === 0 ? 'FREE ✓' : '$' + youPay}
+                </span>
+            </div>
+        </div>`;
+}
+
+async function toggleHealthShare() {
+    if (!selectedDoc) return;
+    const cb = document.getElementById('shareFile');
+    const st = document.getElementById('share-status');
+    try {
+        const res = await fetch('/api/health-sharing/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ docid: selectedDoc.docid })
+        });
+        const data = await res.json();
+        st.innerText = data.shared ? 'ON' : 'OFF';
+        st.style.color = data.shared ? '#27ae60' : '#888';
+        cb.checked = data.shared;
+        if (data.shared) sharedDocIds.push(selectedDoc.docid);
+        else sharedDocIds = sharedDocIds.filter(id => id !== selectedDoc.docid);
+    } catch(e) {}
+}
+
+async function bookAppointment() {
+    const docid = document.getElementById('doctorSelect').value;
+    const date  = document.getElementById('appointmentDate').value;
+    const resultDiv = document.getElementById('result-msg');
+    if (!docid) { alert('Please select a doctor in Step 5.'); return; }
+    if (!date)  { alert('Please select a date in Step 6.'); return; }
+
+    resultDiv.innerHTML = '<p style="color:#666;">⏳ Booking your appointment...</p>';
+    try {
+        const res  = await fetch('/api/book', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ docid, appodate: date })
+        });
+        const data = await res.json();
+        if (data.success) {
+            const flag   = countryFlags[selectedDoc?.country] || '';
+            const insPercent2 = parseInt(document.getElementById('insPercent')?.value || 0);
+            const discount = hasInsurance ? Math.round((selectedDoc?.fee||0) * insPercent2 / 100) : 0;
+            const youPay   = (selectedDoc?.fee || 0) - discount;
+            resultDiv.innerHTML = `
+                <div style="background:#e6f9ee;border:1px solid #28a745;padding:20px;border-radius:12px;color:#155724;">
+                    <p style="font-size:1.1rem;font-weight:800;margin-bottom:12px;">✅ Appointment Booked!</p>
+                    <p style="margin:5px 0;font-size:0.88rem;">👨‍⚕️ <b>${selectedDoc?.docname}</b></p>
+                    <p style="margin:5px 0;font-size:0.88rem;">${flag} ${selectedDoc?.hospital}</p>
+                    <p style="margin:5px 0;font-size:0.88rem;">📅 <b>${date}</b></p>
+                    <p style="margin:5px 0;font-size:0.88rem;">💰 You Pay: <b>${youPay === 0 ? 'FREE' : '$'+youPay}</b></p>
+                    <p style="margin:5px 0;font-size:0.88rem;">🔖 Ref: <b>HMS-${String(data.appointmentId).padStart(4,'0')}</b></p>
+                    <div style="display:flex;gap:10px;margin-top:15px;">
+                        <button onclick="location.href='/dashboard'" style="flex:1;padding:10px;background:#007bff;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;">Dashboard</button>
+                        <button onclick="location.href='/mybookings'" style="flex:1;padding:10px;background:white;color:#007bff;border:2px solid #007bff;border-radius:8px;cursor:pointer;font-weight:700;">My Bookings</button>
+                    </div>
+                </div>`;
+        } else {
+            resultDiv.innerHTML = `<p style="color:red;">❌ Booking failed. Please try again.</p>`;
+        }
+    } catch(e) {
+        resultDiv.innerHTML = `<p style="color:red;">❌ Server error. Is the server running?</p>`;
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HMS — System Architecture</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            padding: 40px;
+            color: #222;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #0a3d62;
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #777;
+            margin-bottom: 36px;
+            letter-spacing: 1px;
+        }
+
+        /* ── Layers ── */
+        .layer {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+        .layer-label {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #aaa;
+            margin-bottom: 6px;
+            padding-left: 4px;
+        }
+        .layer-row {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+            justify-content: center;
+        }
+
+        /* ── Boxes ── */
+        .box {
+            border-radius: 10px;
+            padding: 14px 18px;
+            text-align: center;
+            min-width: 130px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        }
+        .box .icon {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .box .title {
+            font-size: 0.82rem;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .box .desc {
+            font-size: 0.68rem;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        /* Colours by layer */
+        .client   { background: #e8f4fd; border: 2px solid #3498db; }
+        .client .title { color: #1a5276; }
+
+        .gateway  { background: #eafaf1; border: 2px solid #27ae60; }
+        .gateway .title { color: #1e8449; }
+
+        .app      { background: #fef9e7; border: 2px solid #f1c40f; }
+        .app .title { color: #7d6608; }
+
+        .db       { background: #fdf2f8; border: 2px solid #8e44ad; }
+        .db .title { color: #6c3483; }
+
+        .auth     { background: #fdebd0; border: 2px solid #e67e22; }
+        .auth .title { color: #784212; }
+
+        .wide { flex: 1; max-width: 300px; }
+        .med  { min-width: 160px; }
+
+        /* ── Arrows ── */
+        .arrow-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 32px;
+            gap: 12px;
+        }
+        .arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            max-width: 200px;
+        }
+        .arrow-line {
+            width: 2px;
+            height: 14px;
+            background: #bbb;
+        }
+        .arrow-head {
+            width: 0; height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #bbb;
+        }
+        .arrow-label {
+            font-size: 0.6rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        /* ── Connector lines between boxes in same row ── */
+        .connector {
+            display: flex;
+            align-items: center;
+            color: #bbb;
+            font-size: 1.2rem;
+            padding: 0 4px;
+        }
+
+        /* ── Legend ── */
+        .legend {
+            margin-top: 32px;
+            border-top: 1px solid #ddd;
+            padding-top: 18px;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: #555;
+        }
+        .legend-dot {
+            width: 14px; height: 14px;
+            border-radius: 3px;
+            border: 2px solid;
+        }
+
+        /* ── Full diagram wrapper ── */
+        .diagram {
+            max-width: 860px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 36px 40px 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        /* ── Tech badge row ── */
+        .tech-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+        .tech-badge {
+            background: #f0f2f5;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #444;
+        }
+
+        @media print {
+            body { background: white; padding: 10px; }
+            .diagram { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="diagram">
+
+    <h1>Hospital Management System</h1>
+    <div class="subtitle">Three-Tier Web Application — System Architecture Diagram</div>
+
+    <!-- ── TIER 1: CLIENT LAYER ── -->
+    <div class="layer">
+        <div class="layer-label">Tier 1 — Presentation Layer (Client)</div>
+        <div class="layer-row">
+            <div class="box client">
+                <span class="icon">🧑‍⚕️</span>
+                <span class="title">Patient Portal</span>
+                <span class="desc">Dashboard · Appointments<br>Health Record · Lab Results</span>
+            </div>
+            <div class="box client">
+                <span class="icon">👨‍⚕️</span>
+                <span class="title">Doctor Portal</span>
+                <span class="desc">My Patients · Add Results<br>Appointments · Profile</span>
+            </div>
+            <div class="box client">
+                <span class="icon">🔐</span>
+                <span class="title">Admin Panel</span>
+                <span class="desc">Manage Doctors · Patients<br>All Appointments</span>
+            </div>
+        </div>
+        <div style="text-align:center;font-size:0.68rem;color:#aaa;margin-top:6px;">
+            HTML5 &nbsp;|&nbsp; CSS3 &nbsp;|&nbsp; JavaScript (fetch API) &nbsp;|&nbsp; Font Awesome 6
+        </div>
+    </div>
+
+    <!-- Arrow down -->
+    <div class="arrow-row">
+        <div class="arrow">
+            <div class="arrow-label">HTTP / HTTPS Requests &amp; Responses (JSON)</div>
+            <div class="arrow-line"></div>
+            <div class="arrow-head"></div>
+        </div>
+    </div>
+
+    <!-- ── TIER 2: APPLICATION LAYER ── -->
+    <div class="layer">
+        <div class="layer-label">Tier 2 — Application Layer (Server)</div>
+        <div class="layer-row">
+
+            <div class="box gateway med">
+                <span class="icon">🔒</span>
+                <span class="title">Auth Middleware</span>
+                <span class="desc">requireLogin()<br>Session Check<br>Role Verification</span>
+            </div>
+
+            <div class="box app wide">
+                <span class="icon">⚙️</span>
+                <span class="title">Express.js Server — Node.js</span>
+                <span class="desc">
+                    /api/me &nbsp;·&nbsp; /api/appointments<br>
+                    /api/results &nbsp;·&nbsp; /api/health-record<br>
+                    /api/doctor/* &nbsp;·&nbsp; /api/admin/*<br>
+                    /auth/login &nbsp;·&nbsp; /auth/register
+                </span>
+            </div>
+
+            <div class="box auth med">
+                <span class="icon">🍪</span>
+                <span class="title">Session Store</span>
+                <span class="desc">express-session<br>24h expiry<br>User ID · Role · Name</span>
+            </div>
+
+        </div>
+        <div style="text-align:center;font-size:0.68rem;color:#aaa;margin-top:6px;">
+            Node.js v18 &nbsp;|&nbsp; Express.js &nbsp;|&nbsp; express-session &nbsp;|&nbsp; Port 3000
+        </div>
+    </div>
+
+    <!-- Arrow down -->
+    <div class="arrow-row">
+        <div class="arrow">
+            <div class="arrow-label">SQL Queries &amp; Result Sets (mysql2)</div>
+            <div class="arrow-line"></div>
+            <div class="arrow-head"></div>
+        </div>
+    </div>
+
+    <!-- ── TIER 3: DATA LAYER ── -->
+    <div class="layer">
+        <div class="layer-label">Tier 3 — Data Layer (Database)</div>
+        <div class="layer-row">
+            <div class="box db">
+                <span class="icon">👤</span>
+                <span class="title">patient</span>
+                <span class="desc">pid · pname · pemail<br>pdob · pnic · paddress</span>
+            </div>
+            <div class="box db">
+                <span class="icon">🩺</span>
+                <span class="title">doctor</span>
+                <span class="desc">docid · docname · specialties<br>country · city · rating</span>
+            </div>
+            <div class="box db">
+                <span class="icon">📅</span>
+                <span class="title">appointment</span>
+                <span class="desc">appoid · pid · scheduleid<br>appodate · status</span>
+            </div>
+            <div class="box db">
+                <span class="icon">🧪</span>
+                <span class="title">lab_result</span>
+                <span class="desc">id · pid · docid<br>test_name · result · notes</span>
+            </div>
+            <div class="box db">
+                <span class="icon">🔑</span>
+                <span class="title">webuser</span>
+                <span class="desc">email · usertype<br>(p / d / a)</span>
+            </div>
+        </div>
+        <div style="text-align:center;font-size:0.68rem;color:#aaa;margin-top:6px;">
+            MySQL 8.0 &nbsp;|&nbsp; Database: hospital_management &nbsp;|&nbsp; 9 Tables
+        </div>
+    </div>
+
+    <!-- ── Data Flow Summary ── -->
+    <div style="margin-top:28px; background:#f8f9fa; border-radius:10px; padding:16px 20px; border-left:4px solid #0a3d62;">
+        <div style="font-size:0.78rem; font-weight:800; color:#0a3d62; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">
+            Data Flow
+        </div>
+        <div style="display:flex; gap:0; align-items:center; flex-wrap:wrap; font-size:0.75rem; color:#444;">
+            <span style="background:#e8f4fd;border:1px solid #3498db;padding:4px 10px;border-radius:6px;">Browser</span>
+            <span style="color:#aaa;padding:0 8px;">──▶</span>
+            <span style="background:#eafaf1;border:1px solid #27ae60;padding:4px 10px;border-radius:6px;">HTTP Request</span>
+            <span style="color:#aaa;padding:0 8px;">──▶</span>
+            <span style="background:#fdebd0;border:1px solid #e67e22;padding:4px 10px;border-radius:6px;">Auth Check</span>
+            <span style="color:#aaa;padding:0 8px;">──▶</span>
+            <span style="background:#fef9e7;border:1px solid #f1c40f;padding:4px 10px;border-radius:6px;">Express Route</span>
+            <span style="color:#aaa;padding:0 8px;">──▶</span>
+            <span style="background:#fdf2f8;border:1px solid #8e44ad;padding:4px 10px;border-radius:6px;">MySQL Query</span>
+            <span style="color:#aaa;padding:0 8px;">──▶</span>
+            <span style="background:#fdf2f8;border:1px solid #8e44ad;padding:4px 10px;border-radius:6px;">JSON Response</span>
+            <span style="color:#aaa;padding:0 8px;">──▶</span>
+            <span style="background:#e8f4fd;border:1px solid #3498db;padding:4px 10px;border-radius:6px;">Render UI</span>
+        </div>
+    </div>
+
+    <!-- ── Legend ── -->
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-dot" style="background:#e8f4fd;border-color:#3498db;"></div>
+            Presentation Layer (HTML/JS)
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background:#eafaf1;border-color:#27ae60;"></div>
+            Authentication / Middleware
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background:#fef9e7;border-color:#f1c40f;"></div>
+            Application Logic (Express.js)
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background:#fdebd0;border-color:#e67e22;"></div>
+            Session Management
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background:#fdf2f8;border-color:#8e44ad;"></div>
+            Data Layer (MySQL)
+        </div>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;font-size:0.68rem;color:#bbb;letter-spacing:1px;">
+        OSTİM Technical University — HMS Project — April 2026
+    </div>
+
+</div>
+
+</body>
+</html>

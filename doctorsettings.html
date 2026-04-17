@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Add Lab Result</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .test-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .test-type-btn {
+            padding: 15px 10px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+        }
+        .test-type-btn:hover, .test-type-btn.active {
+            border-color: #007bff;
+            background: #e7f1ff;
+            color: #007bff;
+        }
+        .test-type-btn .icon {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        .result-field { display: none; }
+        .result-field.active { display: block; }
+        .sub-test-btn {
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            margin: 5px;
+            transition: 0.3s;
+        }
+        .sub-test-btn:hover { border-color: #007bff; color: #007bff; }
+        .sub-test-btn.active {
+            border-color: #007bff;
+            background: #007bff;
+            color: white;
+        }
+        .range-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: #e7f1ff;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #0056b3;
+        }
+        .book-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+        .book-card h3 {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-num {
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .status-btn {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            margin: 4px;
+            transition: 0.3s;
+        }
+        .status-btn.active-normal   { background:#e6f9ee; color:#28a745; border-color:#28a745; }
+        .status-btn.active-high     { background:#fde8e8; color:#dc3545; border-color:#dc3545; }
+        .status-btn.active-low      { background:#fff8e1; color:#ffc107; border-color:#ffc107; }
+        .status-btn.active-positive { background:#fde8e8; color:#dc3545; border-color:#dc3545; }
+        .status-btn.active-negative { background:#e6f9ee; color:#28a745; border-color:#28a745; }
+        .status-btn.active-pending  { background:#f0f2f5; color:#6c757d; border-color:#6c757d; }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #555;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: #f0f2f5;
+            border-color: #007bff;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="sidebar">
+        <div class="logo" style="margin-bottom:30px; text-align:center;">
+            <img src="/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+        </div>
+        <nav style="display:flex; flex-direction:column; gap:15px;">
+            <a href="/doctor" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+            <a href="/mypatients" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-users"></i> My Patients
+            </a>
+            <a href="/addresult" class="btn-nav dark"
+               style="justify-content:flex-start; background:#e7f1ff; color:#007bff;">
+                <i class="fas fa-flask"></i> Add Lab Result
+            </a>
+            <a href="/doctors" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-user-md"></i> All Doctors
+            </a>
+            <a href="/doctorsettings" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+            <a href="/logout" class="btn-nav dark" style="justify-content:flex-start; color:#dc3545;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+
+        <!-- Back Button -->
+        <button onclick="history.back()" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+
+        <header style="display:flex; justify-content:space-between;
+                       align-items:center; margin-bottom:25px;">
+            <div>
+                <h1 style="font-size:1.8rem;">
+                    <i class="fas fa-flask" style="color:#007bff;"></i> Add Lab Result
+                </h1>
+                <p style="color:#666;">Add medical test results for your patients</p>
+            </div>
+            <button onclick="location.href='/mypatients'"
+                style="background:white; color:#17a2b8; border:2px solid #17a2b8;
+                       padding:10px 20px; border-radius:8px; cursor:pointer;
+                       font-weight:600; font-size:0.9rem;">
+                <i class="fas fa-users"></i> My Patients
+            </button>
+        </header>
+
+        <div style="display:flex; gap:25px; align-items:flex-start; flex-wrap:wrap;">
+
+            <!-- Left: Form -->
+            <div style="flex:1; min-width:300px;">
+
+                <!-- Step 1: Patient -->
+                <div class="book-card">
+                    <h3>
+                        <span class="step-num">1</span>
+                        Select Patient
+                    </h3>
+                    <select class="form-input" id="patient-select" onchange="updatePreview()">
+                        <option value="">-- Select a Patient --</option>
+                    </select>
+                </div>
+
+                <!-- Step 2: Test Type -->
+                <div class="book-card">
+                    <h3>
+                        <span class="step-num">2</span>
+                        Select Test Type
+                    </h3>
+                    <div class="test-type-grid">
+                        <div class="test-type-btn" onclick="selectTest('Blood Test', this)">
+                            <span class="icon">🩸</span>Blood Test
+                        </div>
+                        <div class="test-type-btn" onclick="selectTest('Urine Test', this)">
+                            <span class="icon">🧪</span>Urine Test
+                        </div>
+                        <div class="test-type-btn" onclick="selectTest('X-Ray', this)">
+                            <span class="icon">🔬</span>X-Ray
+                        </div>
+                        <div class="test-type-btn" onclick="selectTest('MRI', this)">
+                            <span class="icon">🧲</span>MRI Scan
+                        </div>
+                        <div class="test-type-btn" onclick="selectTest('ECG', this)">
+                            <span class="icon">❤️</span>ECG
+                        </div>
+                        <div class="test-type-btn" onclick="selectTest('Ultrasound', this)">
+                            <span class="icon">📡</span>Ultrasound
+                        </div>
+                        <div class="test-type-btn" onclick="selectTest('COVID-19', this)">
+                            <span class="icon">🦠</span>COVID-19
+                        </div>
+                        <div class="test-type-btn" onclick="selectTest('Other', this)">
+                            <span class="icon">📋</span>Other Test
+                        </div>
+                    </div>
+
+                    <!-- Sub Blood -->
+                    <div id="sub-blood" class="result-field">
+                        <p style="font-size:0.85rem; font-weight:600; color:#666; margin-bottom:8px;">
+                            Select Blood Test:
+                        </p>
+                        <button class="sub-test-btn" onclick="selectSubTest('CBC - Complete Blood Count', this)">CBC</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Blood Sugar (Glucose)', this)">Blood Sugar</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Cholesterol', this)">Cholesterol</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Hemoglobin', this)">Hemoglobin</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Blood Pressure Check', this)">Blood Pressure</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Liver Function Test', this)">Liver Function</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Kidney Function Test', this)">Kidney Function</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Thyroid Function (TSH)', this)">Thyroid (TSH)</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Iron Level', this)">Iron Level</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Vitamin D', this)">Vitamin D</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Vitamin B12', this)">Vitamin B12</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Blood Group & Rh', this)">Blood Group</button>
+                    </div>
+
+                    <!-- Sub Urine -->
+                    <div id="sub-urine" class="result-field">
+                        <p style="font-size:0.85rem; font-weight:600; color:#666; margin-bottom:8px;">
+                            Select Urine Test:
+                        </p>
+                        <button class="sub-test-btn" onclick="selectSubTest('Urinalysis - Complete', this)">Urinalysis</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Urine Culture', this)">Urine Culture</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Creatinine - Urine', this)">Creatinine</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Protein in Urine', this)">Protein</button>
+                    </div>
+
+                    <!-- Sub X-Ray -->
+                    <div id="sub-xray" class="result-field">
+                        <p style="font-size:0.85rem; font-weight:600; color:#666; margin-bottom:8px;">
+                            Select X-Ray Area:
+                        </p>
+                        <button class="sub-test-btn" onclick="selectSubTest('X-Ray - Chest', this)">Chest</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('X-Ray - Spine', this)">Spine</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('X-Ray - Hand/Wrist', this)">Hand/Wrist</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('X-Ray - Knee', this)">Knee</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('X-Ray - Hip', this)">Hip</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('X-Ray - Skull', this)">Skull</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('X-Ray - Abdomen', this)">Abdomen</button>
+                    </div>
+
+                    <!-- Sub MRI -->
+                    <div id="sub-mri" class="result-field">
+                        <p style="font-size:0.85rem; font-weight:600; color:#666; margin-bottom:8px;">
+                            Select MRI Area:
+                        </p>
+                        <button class="sub-test-btn" onclick="selectSubTest('MRI - Brain', this)">Brain</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('MRI - Spine', this)">Spine</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('MRI - Knee', this)">Knee</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('MRI - Shoulder', this)">Shoulder</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('MRI - Abdomen', this)">Abdomen</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('MRI - Pelvis', this)">Pelvis</button>
+                    </div>
+
+                    <!-- Sub Ultrasound -->
+                    <div id="sub-ultrasound" class="result-field">
+                        <p style="font-size:0.85rem; font-weight:600; color:#666; margin-bottom:8px;">
+                            Select Ultrasound Area:
+                        </p>
+                        <button class="sub-test-btn" onclick="selectSubTest('Ultrasound - Abdomen', this)">Abdomen</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Ultrasound - Thyroid', this)">Thyroid</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Ultrasound - Pelvis', this)">Pelvis</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Ultrasound - Cardiac (Echo)', this)">Cardiac</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('Ultrasound - Kidney', this)">Kidney</button>
+                    </div>
+
+                    <!-- Sub COVID -->
+                    <div id="sub-covid" class="result-field">
+                        <p style="font-size:0.85rem; font-weight:600; color:#666; margin-bottom:8px;">
+                            Select Test:
+                        </p>
+                        <button class="sub-test-btn" onclick="selectSubTest('COVID-19 PCR Test', this)">PCR Test</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('COVID-19 Antigen Test', this)">Antigen Test</button>
+                        <button class="sub-test-btn" onclick="selectSubTest('COVID-19 Antibody Test', this)">Antibody Test</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Result -->
+                <div class="book-card">
+                    <h3>
+                        <span class="step-num">3</span>
+                        Enter Result
+                    </h3>
+
+                    <div class="range-indicator" id="normal-range" style="display:none;">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="range-text">Normal range: --</span>
+                    </div>
+
+                    <input class="form-input" id="result-input"
+                           placeholder="Enter result value (e.g. 120/80 mmHg, Negative, 5.2 mmol/L)"
+                           oninput="updatePreview()">
+
+                    <p style="font-size:0.9rem; font-weight:600; color:#444; margin-bottom:10px;">
+                        Status:
+                    </p>
+                    <div style="flex-wrap:wrap; margin-bottom:15px;">
+                        <button class="status-btn active-normal" id="status-normal"
+                            onclick="selectStatus('Normal', this)">✅ Normal</button>
+                        <button class="status-btn" id="status-high"
+                            onclick="selectStatus('High', this)">⚠️ High</button>
+                        <button class="status-btn" id="status-low"
+                            onclick="selectStatus('Low', this)">⬇️ Low</button>
+                        <button class="status-btn" id="status-positive"
+                            onclick="selectStatus('Positive', this)">🔴 Positive</button>
+                        <button class="status-btn" id="status-negative"
+                            onclick="selectStatus('Negative', this)">🟢 Negative</button>
+                        <button class="status-btn" id="status-pending"
+                            onclick="selectStatus('Pending', this)">⏳ Pending</button>
+                    </div>
+
+                    <p style="font-size:0.9rem; font-weight:600; color:#444; margin-bottom:8px;">
+                        Doctor's Notes (optional):
+                    </p>
+                    <textarea class="form-input" id="notes-input" rows="3"
+                              placeholder="Add notes, recommendations or observations..."
+                              style="resize:vertical;"></textarea>
+
+                    <button onclick="submitResult()"
+                        style="background:#007bff; color:white; border:none; padding:16px;
+                               border-radius:10px; cursor:pointer; font-weight:700;
+                               width:100%; font-size:1rem; transition:0.3s;">
+                        <i class="fas fa-plus"></i> Add Lab Result
+                    </button>
+
+                    <div id="submit-msg" style="margin-top:15px;"></div>
+                </div>
+            </div>
+
+            <!-- Right: Preview & Recent -->
+            <div style="width:300px; flex-shrink:0;">
+
+                <!-- Preview -->
+                <div class="book-card" style="text-align:center;">
+                    <h3 style="justify-content:center; margin-bottom:20px;">
+                        <i class="fas fa-eye" style="color:#007bff;"></i> Preview
+                    </h3>
+                    <div id="preview-box">
+                        <div style="font-size:2.5rem; color:#ddd; margin-bottom:10px;">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <p style="color:#aaa; font-size:0.85rem;">
+                            Select patient and test to preview
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Recently Added -->
+                <div class="book-card">
+                    <h3 style="margin-bottom:15px;">
+                        <i class="fas fa-history" style="color:#666;"></i> Recently Added
+                    </h3>
+                    <div id="recent-list">
+                        <p style="color:#aaa; font-size:0.85rem; text-align:center; padding:10px;">
+                            No recent results yet
+                        </p>
+                    </div>
+                </div>
+
+                <!-- AI Assistant Card -->
+                <div class="book-card" style="background:#e7f1ff; border:none;">
+                    <h3 style="margin-bottom:10px; color:#0056b3;">
+                        <i class="fas fa-robot" style="color:#007bff;"></i> AI Assistant
+                    </h3>
+                    <p style="font-size:0.85rem; color:#0056b3; line-height:1.6; margin-bottom:10px;">
+                        Ask the AI for help with test interpretations or normal ranges!
+                    </p>
+                    <button onclick="toggleChat()"
+                        style="background:#007bff; color:white; border:none; padding:8px 16px;
+                               border-radius:8px; cursor:pointer; font-weight:600;
+                               font-size:0.85rem; width:100%;">
+                        🤖 Open AI Chat
+                    </button>
+                </div>
+
+                <!-- Tips -->
+                <div class="book-card">
+                    <h3 style="margin-bottom:15px;">
+                        <i class="fas fa-lightbulb" style="color:#ffc107;"></i> Tips
+                    </h3>
+                    <div style="font-size:0.85rem; color:#666; line-height:1.8;">
+                        <p>✅ Always verify test results</p>
+                        <p>✅ Add clear doctor notes</p>
+                        <p>✅ Patient sees results instantly</p>
+                        <p>✅ Use correct normal ranges</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-btn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span>🏥 HMS AI Assistant</span>
+            <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="msg bot-msg">
+                🔬 Hello Doctor! I can help you interpret test results and normal ranges. Try asking <b>"What is the normal range for cholesterol?"</b> or <b>"What does high TSH mean?"</b>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Ask about test results...">
+            <button onclick="handleChat()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
+    <script>
+        let selectedTestType = '';
+        let selectedSubTest  = '';
+        let selectedStatus   = 'Normal';
+
+        const normalRanges = {
+            'CBC - Complete Blood Count': 'WBC: 4.5-11.0 K/uL | RBC: 4.5-5.5 M/uL | Platelets: 150-400 K/uL',
+            'Blood Sugar (Glucose)': 'Fasting: 70-100 mg/dL | Post-meal: < 140 mg/dL',
+            'Cholesterol': 'Total: < 200 mg/dL | LDL: < 100 mg/dL | HDL: > 40 mg/dL',
+            'Hemoglobin': 'Men: 13.5-17.5 g/dL | Women: 12.0-15.5 g/dL',
+            'Blood Pressure Check': 'Normal: < 120/80 mmHg | High: > 140/90 mmHg',
+            'Thyroid Function (TSH)': 'Normal TSH: 0.4-4.0 mIU/L',
+            'Iron Level': 'Men: 65-177 mcg/dL | Women: 50-170 mcg/dL',
+            'Vitamin D': 'Sufficient: 20-50 ng/mL | Deficient: < 12 ng/mL',
+            'Creatinine - Urine': 'Men: 0.7-1.2 mg/dL | Women: 0.5-1.0 mg/dL',
+        };
+
+        async function loadPatients() {
+            try {
+                const res = await fetch('/api/doctor/patients');
+                const patients = await res.json();
+                const sel = document.getElementById('patient-select');
+                if (patients.length === 0) {
+                    sel.innerHTML = '<option value="">No patients yet — patients appear after booking</option>';
+                    return;
+                }
+                patients.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.pid;
+                    opt.textContent = `${p.pname} (${p.pemail || 'N/A'})`;
+                    sel.appendChild(opt);
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadRecent() {
+            try {
+                const res = await fetch('/api/doctor/results');
+                const results = await res.json();
+                const list = document.getElementById('recent-list');
+                if (!results.length) return;
+                list.innerHTML = results.slice(0,5).map(r => {
+                    const date = r.created_at ? r.created_at.toString().slice(0,10) : '';
+                    return `
+                        <div style="padding:10px 0; border-bottom:1px solid #f0f2f5;">
+                            <p style="margin:0; font-size:0.85rem; font-weight:600; color:#333;">
+                                ${r.test_name}
+                            </p>
+                            <p style="margin:2px 0; font-size:0.8rem; color:#666;">
+                                ${r.pname} — <b>${r.result}</b>
+                            </p>
+                            <p style="margin:0; font-size:0.75rem; color:#aaa;">${date}</p>
+                        </div>`;
+                }).join('');
+            } catch(e) {}
+        }
+
+        function selectTest(type, btn) {
+            selectedTestType = type;
+            selectedSubTest  = type;
+            document.querySelectorAll('.test-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.result-field').forEach(f => f.classList.remove('active'));
+
+            const map = {
+                'Blood Test': 'sub-blood',
+                'Urine Test': 'sub-urine',
+                'X-Ray':      'sub-xray',
+                'MRI':        'sub-mri',
+                'Ultrasound': 'sub-ultrasound',
+                'COVID-19':   'sub-covid'
+            };
+            if (map[type]) {
+                document.getElementById(map[type]).classList.add('active');
+            }
+            updateNormalRange(type);
+            updatePreview();
+        }
+
+        function selectSubTest(name, btn) {
+            selectedSubTest = name;
+            const parentId = btn.closest('.result-field').id;
+            document.querySelectorAll(`#${parentId} .sub-test-btn`)
+                .forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateNormalRange(name);
+            updatePreview();
+        }
+
+        function selectStatus(status, btn) {
+            selectedStatus = status;
+            document.querySelectorAll('.status-btn').forEach(b => {
+                b.className = 'status-btn';
+            });
+            btn.className = `status-btn active-${status.toLowerCase()}`;
+            updatePreview();
+        }
+
+        function updateNormalRange(testName) {
+            const rangeEl   = document.getElementById('normal-range');
+            const rangeText = document.getElementById('range-text');
+            if (normalRanges[testName]) {
+                rangeEl.style.display = 'flex';
+                rangeText.innerText = 'Normal range: ' + normalRanges[testName];
+            } else {
+                rangeEl.style.display = 'none';
+            }
+        }
+
+        function updatePreview() {
+            const patientSel  = document.getElementById('patient-select');
+            const patientName = patientSel.options[patientSel.selectedIndex]?.text
+                                    .split('(')[0].trim() || '—';
+            const result = document.getElementById('result-input').value || '—';
+            const box = document.getElementById('preview-box');
+
+            if (!selectedTestType) {
+                box.innerHTML = `
+                    <div style="font-size:2.5rem; color:#ddd; margin-bottom:10px;">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <p style="color:#aaa; font-size:0.85rem;">
+                        Select patient and test to preview
+                    </p>`;
+                return;
+            }
+
+            const statusColors = {
+                'Normal': '#28a745', 'High': '#dc3545', 'Low': '#ffc107',
+                'Positive': '#dc3545', 'Negative': '#28a745', 'Pending': '#6c757d'
+            };
+            const color = statusColors[selectedStatus] || '#007bff';
+
+            box.innerHTML = `
+                <div style="text-align:left;">
+                    <p style="font-size:0.8rem; color:#aaa; margin:0;">Patient</p>
+                    <p style="font-weight:700; margin:2px 0 12px; color:#333;">
+                        ${patientName}
+                    </p>
+                    <p style="font-size:0.8rem; color:#aaa; margin:0;">Test</p>
+                    <p style="font-weight:700; margin:2px 0 12px; color:#007bff; font-size:0.9rem;">
+                        ${selectedSubTest}
+                    </p>
+                    <p style="font-size:0.8rem; color:#aaa; margin:0;">Result</p>
+                    <p style="font-size:1.4rem; font-weight:800; color:${color}; margin:2px 0 12px;">
+                        ${result}
+                    </p>
+                    <span style="background:${color}22; color:${color}; padding:5px 15px;
+                          border-radius:15px; font-size:0.85rem; font-weight:700;">
+                        ${selectedStatus}
+                    </span>
+                </div>`;
+        }
+
+        async function submitResult() {
+            const pid    = document.getElementById('patient-select').value;
+            const result = document.getElementById('result-input').value.trim();
+            const notes  = document.getElementById('notes-input').value.trim();
+            const msgDiv = document.getElementById('submit-msg');
+
+            if (!pid) { alert('Please select a patient!'); return; }
+            if (!selectedSubTest || selectedSubTest === selectedTestType) {
+                alert('Please select a specific test!'); return;
+            }
+            if (!result) { alert('Please enter a result!'); return; }
+
+            const fullNotes = selectedStatus + (notes ? ' — ' + notes : '');
+
+            try {
+                const res = await fetch('/api/doctor/results/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pid,
+                        test_name: selectedSubTest,
+                        result,
+                        notes: fullNotes
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    msgDiv.innerHTML = `
+                        <div style="background:#e6f9ee; border:1px solid #28a745;
+                                    padding:15px; border-radius:10px; color:#1a7a3c;">
+                            <p style="margin:0; font-weight:700;">✅ Lab result added successfully!</p>
+                            <p style="margin:5px 0 0; font-size:0.85rem;">
+                                Patient can now view this result in their Lab Results page.
+                            </p>
+                        </div>`;
+                    document.getElementById('result-input').value = '';
+                    document.getElementById('notes-input').value  = '';
+                    loadRecent();
+                    setTimeout(() => { msgDiv.innerHTML = ''; }, 5000);
+                }
+            } catch(e) { alert('Error adding result. Is the server running?'); }
+        }
+
+        loadPatients();
+        loadRecent();
+    </script>
+</body>
+</html>

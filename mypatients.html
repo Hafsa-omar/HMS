@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | My Patients</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .patient-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: 0.3s;
+            border-left: 5px solid #17a2b8;
+        }
+        .patient-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .patient-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #17a2b8, #0f6674);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+        }
+        .search-input:focus { border-color: #17a2b8; }
+        .info-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f0f2f5;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #555;
+            margin-right: 8px;
+            margin-top: 5px;
+        }
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-bg.active { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            animation: popIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+            align-items: center;
+        }
+        .info-label {
+            width: 130px;
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .info-value {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #555;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: #f0f2f5;
+            border-color: #17a2b8;
+            color: #17a2b8;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="sidebar">
+        <div class="logo" style="margin-bottom:30px; text-align:center;">
+            <img src="/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+        </div>
+        <nav style="display:flex; flex-direction:column; gap:15px;">
+            <a href="/doctor" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+            <a href="/mypatients" class="btn-nav dark"
+               style="justify-content:flex-start; background:#e0f7fa; color:#17a2b8;">
+                <i class="fas fa-users"></i> My Patients
+            </a>
+            <a href="/addresult" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-flask"></i> Add Lab Result
+            </a>
+            <a href="/doctors" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-user-md"></i> All Doctors
+            </a>
+            <a href="/doctorsettings" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+            <a href="/logout" class="btn-nav dark" style="justify-content:flex-start; color:#dc3545;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+
+        <!-- Back Button -->
+        <button onclick="history.back()" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+
+        <header style="display:flex; justify-content:space-between;
+                       align-items:center; margin-bottom:25px;">
+            <div>
+                <h1 style="font-size:1.8rem;">
+                    <i class="fas fa-users" style="color:#17a2b8;"></i> My Patients
+                </h1>
+                <p style="color:#666;">Patients who have booked appointments with you</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <span id="patient-count"
+                    style="background:#e0f7fa; color:#17a2b8; padding:8px 20px;
+                           border-radius:20px; font-weight:700; font-size:0.9rem;">
+                    0 Patients
+                </span>
+                <button onclick="location.href='/addresult'"
+                    style="background:#007bff; color:white; border:none; padding:10px 20px;
+                           border-radius:8px; cursor:pointer; font-weight:600; font-size:0.9rem;">
+                    <i class="fas fa-flask"></i> Add Lab Result
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div style="display:flex; gap:15px; margin-bottom:25px;">
+            <div style="background:white; border-radius:12px; padding:20px; flex:1;
+                        box-shadow:0 3px 10px rgba(0,0,0,0.06); text-align:center;">
+                <p style="font-size:1.8rem; font-weight:800; color:#17a2b8; margin:0;"
+                   id="stat-total">0</p>
+                <p style="color:#666; font-size:0.85rem; margin:5px 0 0;">Total Patients</p>
+            </div>
+            <div style="background:white; border-radius:12px; padding:20px; flex:1;
+                        box-shadow:0 3px 10px rgba(0,0,0,0.06); text-align:center;">
+                <p style="font-size:1.8rem; font-weight:800; color:#007bff; margin:0;"
+                   id="stat-appointments">0</p>
+                <p style="color:#666; font-size:0.85rem; margin:5px 0 0;">Total Appointments</p>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <input type="text" class="search-input"
+               placeholder="🔍 Search patients by name or email..."
+               oninput="searchPatients(this.value)">
+
+        <!-- Patient List -->
+        <div id="patients-list">
+            <div style="text-align:center; padding:60px; color:#666;">
+                ⏳ Loading patients...
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Detail Modal -->
+    <div class="modal-bg" id="patientModal">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between;
+                        align-items:center; margin-bottom:20px;">
+                <h2 style="margin:0; font-size:1.2rem;">
+                    <i class="fas fa-user" style="color:#17a2b8;"></i> Patient Details
+                </h2>
+                <button onclick="closeModal()"
+                    style="background:none; border:none; font-size:1.5rem;
+                           cursor:pointer; color:#666;">✕</button>
+            </div>
+
+            <div style="text-align:center; margin-bottom:20px;">
+                <div id="modal-avatar"
+                    style="width:80px; height:80px;
+                           background:linear-gradient(135deg,#17a2b8,#0f6674);
+                           border-radius:50%; display:flex; align-items:center;
+                           justify-content:center; margin:0 auto 10px;
+                           font-size:1.8rem; color:white; font-weight:800;">
+                </div>
+                <h3 id="modal-name" style="margin:0;"></h3>
+                <p id="modal-email" style="color:#666; font-size:0.9rem; margin:4px 0;"></p>
+            </div>
+
+            <div id="modal-info"></div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="closeModal()"
+                    style="flex:1; padding:12px; background:#f0f2f5; border:none;
+                           border-radius:8px; cursor:pointer; font-weight:600;">
+                    Close
+                </button>
+                <button onclick="location.href='/addresult'"
+                    style="flex:1; padding:12px; background:#007bff; color:white;
+                           border:none; border-radius:8px; cursor:pointer; font-weight:600;">
+                    <i class="fas fa-flask"></i> Add Lab Result
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-btn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span>🏥 HMS AI Assistant</span>
+            <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="msg bot-msg">
+                👨‍⚕️ Hello Doctor! I can see all your patients. Try asking <b>"How many patients do I have?"</b> or <b>"Find patient John"</b>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Ask about your patients...">
+            <button onclick="handleChat()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
+    <script>
+        let allPatients = [];
+
+        async function loadPatients() {
+            try {
+                const res = await fetch('/api/doctor/patients');
+                allPatients = await res.json();
+
+                document.getElementById('stat-total').innerText = allPatients.length;
+                document.getElementById('patient-count').innerText =
+                    allPatients.length + ' Patients';
+
+                const totalAppts = allPatients.reduce((sum, p) =>
+                    sum + (parseInt(p.total_appointments) || 0), 0);
+                document.getElementById('stat-appointments').innerText = totalAppts;
+
+                renderPatients(allPatients);
+            } catch(e) {
+                document.getElementById('patients-list').innerHTML =
+                    '<p style="text-align:center; color:red; padding:40px;">❌ Error loading patients.</p>';
+            }
+        }
+
+        function searchPatients(query) {
+            const q = query.toLowerCase();
+            const filtered = allPatients.filter(p =>
+                p.pname.toLowerCase().includes(q) ||
+                (p.pemail && p.pemail.toLowerCase().includes(q))
+            );
+            renderPatients(filtered);
+        }
+
+        function renderPatients(patients) {
+            const list = document.getElementById('patients-list');
+
+            if (patients.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align:center; padding:60px; color:#666;">
+                        <i class="fas fa-users"
+                           style="font-size:3rem; color:#ddd; display:block; margin-bottom:15px;"></i>
+                        <p style="font-size:1.1rem;">No patients found.</p>
+                        <p style="font-size:0.9rem; color:#aaa;">
+                            Patients appear here after they book appointments with you.
+                        </p>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = patients.map(p => {
+                const dob = p.pdob ? p.pdob.toString().slice(0,10) : 'N/A';
+                const initials = p.pname.split(' ')
+                    .map(n => n[0]).join('').slice(0,2).toUpperCase();
+
+                return `
+                    <div class="patient-card">
+                        <div class="patient-avatar">${initials}</div>
+                        <div style="flex:1;">
+                            <h3 style="margin:0; font-size:1.05rem;">${p.pname}</h3>
+                            <div style="margin-top:8px; flex-wrap:wrap;">
+                                <span class="info-chip">
+                                    <i class="fas fa-envelope" style="color:#17a2b8;"></i>
+                                    ${p.pemail || 'N/A'}
+                                </span>
+                                <span class="info-chip">
+                                    <i class="fas fa-phone" style="color:#17a2b8;"></i>
+                                    ${p.ptel || 'N/A'}
+                                </span>
+                                <span class="info-chip">
+                                    <i class="fas fa-calendar-check" style="color:#007bff;"></i>
+                                    ${p.total_appointments} appointment(s)
+                                </span>
+                                <span class="info-chip">
+                                    <i class="fas fa-birthday-cake" style="color:#e83e8c;"></i>
+                                    ${dob}
+                                </span>
+                            </div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <button onclick="location.href='/healthrecord?pid=${p.pid}'"
+                                style="background:#0a3d62; color:white; border:none;
+                                       padding:8px 18px; border-radius:8px; cursor:pointer;
+                                       font-weight:600; font-size:0.85rem;">
+                                <i class="fas fa-notes-medical"></i> Health Record
+                            </button>
+                            <button onclick='viewPatient(${JSON.stringify(p)})'
+                                style="background:#e0f7fa; color:#17a2b8;
+                                       border:2px solid #17a2b8; padding:8px 18px;
+                                       border-radius:8px; cursor:pointer;
+                                       font-weight:600; font-size:0.85rem;">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                            <button onclick="location.href='/addresult'"
+                                style="background:#007bff; color:white; border:none;
+                                       padding:8px 18px; border-radius:8px; cursor:pointer;
+                                       font-weight:600; font-size:0.85rem;">
+                                <i class="fas fa-flask"></i> Add Result
+                            </button>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function viewPatient(p) {
+            const dob = p.pdob ? p.pdob.toString().slice(0,10) : 'N/A';
+            const initials = p.pname.split(' ')
+                .map(n => n[0]).join('').slice(0,2).toUpperCase();
+
+            document.getElementById('modal-avatar').innerText = initials;
+            document.getElementById('modal-name').innerText = p.pname;
+            document.getElementById('modal-email').innerText = p.pemail || 'N/A';
+            document.getElementById('modal-info').innerHTML = `
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-phone" style="color:#17a2b8;"></i> Phone
+                    </div>
+                    <div class="info-value">${p.ptel || 'N/A'}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-id-card" style="color:#17a2b8;"></i> NIC
+                    </div>
+                    <div class="info-value">${p.pnic || 'N/A'}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-birthday-cake" style="color:#17a2b8;"></i> DOB
+                    </div>
+                    <div class="info-value">${dob}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-home" style="color:#17a2b8;"></i> Address
+                    </div>
+                    <div class="info-value">${p.paddress || 'N/A'}</div>
+                </div>
+                <div class="info-row" style="border:none;">
+                    <div class="info-label">
+                        <i class="fas fa-calendar-check" style="color:#17a2b8;"></i> Appointments
+                    </div>
+                    <div class="info-value">
+                        <b style="color:#007bff;">${p.total_appointments}</b> total
+                    </div>
+                </div>`;
+
+            document.getElementById('patientModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('patientModal').classList.remove('active');
+        }
+
+        document.getElementById('patientModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        loadPatients();
+    </script>
+</body>
+</html>

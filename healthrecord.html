@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Health Record</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hr-card { background:white; border-radius:14px; padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.07); }
+        .section-title { font-size:0.75rem; font-weight:800; color:#007bff; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+        .info-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; }
+        .info-cell { padding:10px 0; border-bottom:1px solid #f0f2f5; }
+        .info-cell label { font-size:0.7rem; color:#999; text-transform:uppercase; letter-spacing:0.8px; display:block; margin-bottom:3px; }
+        .info-cell span  { font-size:0.9rem; font-weight:700; color:#222; }
+        .timeline { display:flex; flex-direction:column; gap:0; }
+        .tl-item { display:flex; gap:16px; padding:14px 0; border-bottom:1px solid #f5f5f5; align-items:flex-start; }
+        .tl-item:last-child { border-bottom:none; }
+        .tl-dot { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; margin-top:2px; }
+        .tl-dot-appo { background:#e7f1ff; color:#007bff; }
+        .tl-dot-lab  { background:#fff3cd; color:#856404; }
+        .tl-dot-lab.abnormal { background:#fde8e8; color:#dc3545; }
+        .tl-dot-lab.normal   { background:#d4edda; color:#155724; }
+        .status-badge { display:inline-block; padding:2px 10px; border-radius:10px; font-size:0.72rem; font-weight:800; }
+        .badge-booked    { background:#e7f1ff; color:#007bff; }
+        .badge-checked   { background:#d4edda; color:#155724; }
+        .badge-cancelled { background:#f8d7da; color:#721c24; }
+        .result-pill { display:inline-block; padding:2px 9px; border-radius:8px; font-size:0.72rem; font-weight:800; margin-left:6px; }
+        .pill-high     { background:#fde8e8; color:#721c24; }
+        .pill-low      { background:#fff3cd; color:#856404; }
+        .pill-normal   { background:#d4edda; color:#155724; }
+        .pill-positive { background:#fde8e8; color:#721c24; }
+        .pill-negative { background:#d4edda; color:#155724; }
+        .summary-stat  { text-align:center; padding:16px; background:#f8f9fa; border-radius:12px; }
+        .summary-stat .num { font-size:2rem; font-weight:900; }
+        .summary-stat .lbl { font-size:0.78rem; color:#666; margin-top:4px; }
+        .print-bar { background:#0a3d62; color:white; padding:12px 28px; border-radius:10px 10px 0 0; display:flex; justify-content:space-between; align-items:center; }
+
+        /* ── Formal lab report styles (same as results.html) ── */
+        .lab-report-card {
+            background: white; border: 1px solid #aaa; margin-bottom: 24px;
+            font-family: 'Courier New', Courier, monospace; font-size: 0.83rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); page-break-inside: avoid;
+        }
+        .lrpt-header { display:flex; justify-content:space-between; align-items:flex-start; padding:10px 16px; border-bottom:2px solid #222; }
+        .lrpt-header .lab-name { font-family:'Segoe UI',sans-serif; font-size:0.95rem; font-weight:800; color:#111; }
+        .lrpt-header .lab-addr { font-family:'Segoe UI',sans-serif; font-size:0.7rem; color:#555; margin-top:2px; }
+        .lrpt-header .rpt-meta { text-align:right; font-size:0.72rem; font-family:'Segoe UI',sans-serif; color:#333; }
+        .lrpt-title { background:#f0f0f0; border-top:1px solid #999; border-bottom:2px solid #222; text-align:center; padding:4px; font-family:'Segoe UI',sans-serif; font-size:0.85rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:#111; }
+        .lrpt-info-grid { display:grid; grid-template-columns:1fr 1fr 1fr; border-bottom:1px solid #aaa; }
+        .lrpt-info-cell { padding:5px 11px; border-right:1px solid #aaa; font-size:0.78rem; }
+        .lrpt-info-cell:last-child { border-right:none; }
+        .lrpt-info-cell label { display:block; font-size:0.63rem; text-transform:uppercase; color:#666; margin-bottom:2px; font-family:'Segoe UI',sans-serif; }
+        .lrpt-info-cell span { font-weight:700; color:#111; }
+        .lrpt-collect { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; background:#f8f8f8; border-bottom:2px solid #333; }
+        .lrpt-collect div { padding:4px 11px; border-right:1px solid #aaa; font-size:0.75rem; }
+        .lrpt-collect div:last-child { border-right:none; }
+        .lrpt-collect div label { display:block; font-size:0.6rem; text-transform:uppercase; color:#777; margin-bottom:2px; font-family:'Segoe UI',sans-serif; }
+        .lrpt-table { width:100%; border-collapse:collapse; }
+        .lrpt-table thead tr { background:#e0e0e0; border-bottom:2px solid #333; }
+        .lrpt-table th { padding:5px 9px; text-align:left; font-size:0.73rem; text-transform:uppercase; font-family:'Segoe UI',sans-serif; color:#222; border-right:1px solid #aaa; font-weight:800; }
+        .lrpt-table th:last-child { border-right:none; }
+        .lrpt-table td { padding:5px 9px; border-bottom:1px solid #ddd; border-right:1px solid #ddd; vertical-align:middle; }
+        .lrpt-table td:last-child { border-right:none; }
+        .lrpt-table .sec-hdr td { background:#e8e8e8; font-weight:800; font-family:'Segoe UI',sans-serif; font-size:0.78rem; text-transform:uppercase; letter-spacing:1px; color:#333; border-top:1px solid #aaa; }
+        .lrpt-table tr:nth-child(even):not(.sec-hdr) td { background:#fafafa; }
+        .lflag-H { color:#cc0000; font-weight:900; } .lflag-L { color:#cc6600; font-weight:900; } .lflag-A { color:#6600aa; font-weight:900; }
+        .lval-ab { color:#cc0000; font-weight:700; } .lval-n { color:#111; }
+        .lrpt-comment { padding:7px 13px; border-top:1px dashed #aaa; background:#fffdf0; font-size:0.78rem; color:#333; font-family:'Segoe UI',sans-serif; }
+        .lrpt-flag-key { border-top:1px solid #aaa; background:#f5f5f5; padding:5px 13px; font-size:0.72rem; font-family:'Segoe UI',sans-serif; color:#555; display:flex; gap:18px; flex-wrap:wrap; }
+        .lrpt-footer { border-top:2px solid #222; padding:7px 13px; display:flex; justify-content:space-between; align-items:center; font-family:'Segoe UI',sans-serif; }
+        .lrpt-sig { font-size:0.76rem; color:#444; } .lrpt-sig strong { display:block; color:#000; }
+        .lrpt-end { text-align:center; padding:4px; border-top:1px solid #ddd; font-size:0.7rem; color:#777; letter-spacing:2px; font-family:'Segoe UI',sans-serif; }
+
+        @media print {
+            .sidebar, .back-btn, .print-bar button, .chat-btn, .chat-window { display:none !important; }
+            .main-content { margin-left:0 !important; }
+            .hr-card, .lab-report-card { break-inside:avoid; }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+<!-- Sidebar injected by JS based on usertype -->
+<div class="sidebar" id="sidebar">
+    <div class="logo" style="margin-bottom:30px; text-align:center;">
+        <img src="/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+    </div>
+    <div id="portal-label" style="font-size:0.65rem;font-weight:800;letter-spacing:2px;color:#aaa;text-transform:uppercase;margin-bottom:20px;text-align:center;"></div>
+    <nav id="sidebar-nav" style="display:flex; flex-direction:column; gap:15px;"></nav>
+</div>
+
+<div class="main-content">
+    <button onclick="history.back()" class="back-btn" style="display:inline-flex;align-items:center;gap:8px;background:white;border:2px solid #e0e0e0;color:#555;padding:10px 20px;border-radius:10px;cursor:pointer;font-weight:600;font-size:0.9rem;margin-bottom:20px;">
+        <i class="fas fa-arrow-left"></i> Go Back
+    </button>
+
+    <div id="record-container">
+        <div style="text-align:center;padding:60px;color:#aaa;">
+            <i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i>
+            <p style="margin-top:12px;">Loading health record...</p>
+        </div>
+    </div>
+</div>
+
+<script src="chatbot.js"></script>
+<script>
+const params  = new URLSearchParams(window.location.search);
+const viewPid = params.get('pid'); // set when doctor views a patient
+
+async function init() {
+    // Get current user
+    const meRes = await fetch('/api/me');
+    const me    = await meRes.json();
+    buildSidebar(me.usertype);
+
+    // Load record
+    const url = viewPid ? `/api/health-record?pid=${viewPid}` : '/api/health-record';
+    const res  = await fetch(url);
+    const data = await res.json();
+    if (data.error) { document.getElementById('record-container').innerHTML = `<p style="color:red">${data.error}</p>`; return; }
+    renderRecord(data, me);
+}
+
+function buildSidebar(usertype) {
+    document.getElementById('portal-label').innerText = usertype === 'd' ? 'DOCTOR PORTAL' : 'PATIENT VAULT';
+    const color = usertype === 'd' ? '#17a2b8' : '#007bff';
+    const links = usertype === 'd' ? [
+        ['fas fa-th-large',   '/doctor',      'Dashboard'],
+        ['fas fa-users',      '/mypatients',  'My Patients'],
+        ['fas fa-flask',      '/addresult',   'Add Lab Result'],
+        ['fas fa-user-md',    '/doctors',     'All Doctors'],
+        ['fas fa-cog',        '/doctorsettings','Settings'],
+    ] : [
+        ['fas fa-th-large',       '/dashboard',   'Dashboard'],
+        ['fas fa-calendar-plus',  '/book',         'Book Appointment'],
+        ['fas fa-notes-medical',  '/healthrecord', 'Health Record'],
+        ['fas fa-flask',          '/results',      'Lab Results'],
+        ['fas fa-list',           '/mybookings',   'My Bookings'],
+        ['fas fa-cog',            '/settings',     'Settings'],
+    ];
+    const nav = document.getElementById('sidebar-nav');
+    nav.innerHTML = links.map(([icon, href, label]) =>
+        `<a href="${href}" class="btn-nav dark" style="justify-content:flex-start;${location.pathname===href?`background:#e7f1ff;color:${color};`:''}">
+            <i class="${icon}"></i> ${label}
+        </a>`
+    ).join('') + `<hr style="border:0;border-top:1px solid #eee;margin:10px 0;">
+    <a href="/logout" class="btn-nav dark" style="justify-content:flex-start;color:#dc3545;"><i class="fas fa-sign-out-alt"></i> Logout</a>`;
+}
+
+function getStatus(notes) {
+    if (!notes) return { label:'Pending', cls:'pill-pending' };
+    const n = notes.toLowerCase();
+    if (n.startsWith('high'))     return { label:'HIGH',     cls:'pill-high' };
+    if (n.startsWith('low'))      return { label:'LOW',      cls:'pill-low' };
+    if (n.startsWith('positive')) return { label:'POSITIVE', cls:'pill-positive' };
+    if (n.startsWith('negative')) return { label:'NEGATIVE', cls:'pill-negative' };
+    if (n.startsWith('normal'))   return { label:'NORMAL',   cls:'pill-normal' };
+    return { label:'Pending', cls:'pill-pending' };
+}
+
+function getTestIcon(name) {
+    const n = name.toLowerCase();
+    if (n.includes('blood') || n.includes('cbc') || n.includes('glucose') || n.includes('cholesterol') || n.includes('hemoglobin')) return '🩸';
+    if (n.includes('urine') || n.includes('urin')) return '🧪';
+    if (n.includes('x-ray')) return '🔬';
+    if (n.includes('mri'))   return '🧲';
+    if (n.includes('covid')) return '🦠';
+    if (n.includes('kidney') || n.includes('liver')) return '🔵';
+    return '📋';
+}
+
+function cleanNotes(notes) {
+    if (!notes) return '';
+    return notes.replace(/^(Normal|High|Low|Positive|Negative|Pending)\s*[—-]?\s*/i, '').trim();
+}
+
+/* ── Lab report helpers (same logic as results.html) ── */
+const LAB_REF = {
+    'Blood Sugar (Glucose)':       { range: '70 – 100 mg/dL (fasting)', unit: 'mg/dL'  },
+    'Hemoglobin':                  { range: '13.5 – 17.5 g/dL (men)',   unit: 'g/dL'   },
+    'CBC - Complete Blood Count':  { range: 'WBC 4.5-11 | PLT 150-400', unit: 'K/uL'   },
+    'Thyroid Function (TSH)':      { range: '0.4 – 4.0 mIU/L',          unit: 'mIU/L'  },
+    'Cholesterol':                 { range: '< 200 mg/dL',               unit: 'mg/dL'  },
+    'Blood Pressure Check':        { range: '< 120/80 mmHg',             unit: 'mmHg'   },
+    'Vitamin D':                   { range: '20 – 50 ng/mL',             unit: 'ng/mL'  },
+    'Urinalysis':                  { range: 'No pathological findings',  unit: '—'      },
+    'Urine Culture':               { range: 'No growth expected',        unit: '—'      },
+    'COVID-19 PCR Test':           { range: 'Negative (not detected)',   unit: '—'      },
+    'Kidney Function (Creatinine)':{ range: '0.7 – 1.2 mg/dL',          unit: 'mg/dL'  },
+    'Liver Function (ALT)':        { range: '7 – 56 U/L',                unit: 'U/L'    },
+    'Iron Level':                  { range: '65 – 177 mcg/dL',           unit: 'mcg/dL' },
+};
+
+function labParseValue(notes) {
+    if (!notes) return { value: '—', unit: '' };
+    const m = notes.match(/^[A-Za-z]+\s*[—\-]\s*([\d.\/]+)\s*([a-zA-Z%\/]+)/);
+    if (m) return { value: m[1], unit: m[2] };
+    const q = notes.match(/^[A-Za-z]+\s*[—\-]\s*([A-Za-z][A-Za-z\s()]+?)[\.,]/);
+    if (q) return { value: q[1].trim(), unit: '' };
+    return { value: '—', unit: '' };
+}
+
+function buildTimeline(appointments, labResults, profile) {
+    const patName = profile.pname || '—';
+    const patDOB  = profile.pdob  ? profile.pdob.toString().slice(0,10) : '—';
+    const patNIC  = profile.pnic  || '—';
+    const patTel  = profile.ptel  || '—';
+    const patAddr = profile.paddress || '—';
+    const patPID  = `HMS-P-${String(profile.pid).padStart(5,'0')}`;
+    const today   = new Date().toLocaleDateString('en-GB');
+
+    // Group everything by date
+    const groups = {};
+    appointments.forEach(a => {
+        const d = a.appodate ? a.appodate.toString().slice(0,10) : 'Unknown';
+        if (!groups[d]) groups[d] = { appo: null, labs: [] };
+        groups[d].appo = a;
+    });
+    labResults.forEach(r => {
+        const d = r.created_at ? r.created_at.toString().slice(0,10) : 'Unknown';
+        if (!groups[d]) groups[d] = { appo: null, labs: [] };
+        groups[d].labs.push(r);
+    });
+
+    const dates = Object.keys(groups).sort((a,b) => b.localeCompare(a));
+
+    if (dates.length === 0) return '<p style="color:#aaa;text-align:center;padding:20px;">No records yet.</p>';
+
+    return dates.map((date, gi) => {
+        const g      = groups[date];
+        const appo   = g.appo;
+        const labs   = g.labs;
+        const doctor = appo ? appo.docname : (labs[0] ? labs[0].docname : 'N/A');
+        const rptNo  = `HMS-${date.replace(/-/g,'')}-${String(gi+1).padStart(2,'0')}`;
+
+        // Visit status badge
+        const visitHtml = appo ? (() => {
+            const badgeCls = appo.status === 'CHECKED_IN'  ? 'background:#d4edda;color:#155724;' :
+                             appo.status === 'CANCELLED'   ? 'background:#f8d7da;color:#721c24;' :
+                                                             'background:#e7f1ff;color:#00509b;';
+            const badgeTx  = appo.status === 'CHECKED_IN' ? 'Completed' : appo.status;
+            return `
+            <div style="background:#f0f7ff;border-bottom:1px solid #aaa;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;font-family:'Segoe UI',sans-serif;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-hospital" style="color:#00509b;font-size:1rem;"></i>
+                    <div>
+                        <span style="font-weight:800;font-size:0.88rem;color:#00509b;">HOSPITAL VISIT</span>
+                        <span style="display:inline-block;margin-left:8px;padding:2px 10px;border-radius:10px;font-size:0.72rem;font-weight:800;${badgeCls}">${badgeTx}</span>
+                        <div style="font-size:0.78rem;color:#555;margin-top:2px;">
+                            Dr. ${appo.docname} &nbsp;—&nbsp; ${appo.sname || 'General Medicine'}
+                            ${appo.city ? `&nbsp;|&nbsp; <i class="fas fa-map-marker-alt"></i> ${appo.city}` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size:0.75rem;color:#777;text-align:right;">Appointment<br><b>${date}</b></div>
+            </div>`;
+        })() : '';
+
+        // Lab table rows
+        const labTableHtml = labs.length > 0 ? (() => {
+            const comments = labs.map(r => {
+                const c = cleanNotes(r.notes);
+                return c ? `${r.test_name}: ${c}` : '';
+            }).filter(Boolean);
+
+            const tableRows = labs.map(r => {
+                const st = getStatus(r.notes);
+                const { value, unit } = labParseValue(r.notes);
+                const ref = LAB_REF[r.test_name] || { range: '—', unit: unit };
+                let flag = '', normalVal = '', abnormalVal = '';
+                if (st.cls === 'pill-high') {
+                    flag = `<span class="lflag-H">H</span>`;
+                    abnormalVal = `<span class="lval-ab">${value}</span>`;
+                } else if (st.cls === 'pill-low') {
+                    flag = `<span class="lflag-L">L</span>`;
+                    abnormalVal = `<span class="lval-ab">${value}</span>`;
+                } else if (st.cls === 'pill-positive') {
+                    flag = `<span class="lflag-A">A</span>`;
+                    abnormalVal = `<span class="lval-ab">${value}</span>`;
+                } else {
+                    normalVal = `<span class="lval-n">${value}</span>`;
+                }
+                const unitDisp = ref.unit && ref.unit !== '—' ? ref.unit : unit;
+                return `<tr>
+                    <td style="font-weight:600;padding-left:12px;">${r.test_name}</td>
+                    <td style="text-align:center;">${normalVal}</td>
+                    <td style="text-align:center;">${abnormalVal}</td>
+                    <td style="text-align:center;">${flag}</td>
+                    <td style="text-align:center;color:#555;font-size:0.78rem;">${unitDisp}</td>
+                    <td style="color:#444;font-size:0.76rem;">${ref.range}</td>
+                </tr>`;
+            }).join('');
+
+            const commentHtml = comments.length ? `
+            <div class="lrpt-comment">
+                <div style="font-weight:800;text-transform:uppercase;font-size:0.7rem;color:#555;margin-bottom:4px;">Physician / Lab Comments</div>
+                ${comments.map((c,i)=>`<div style="margin-bottom:2px;"><b>${i+1}.</b> ${c}</div>`).join('')}
+            </div>` : '';
+
+            return `
+            <table class="lrpt-table">
+                <thead>
+                    <tr>
+                        <th style="width:32%;">Test</th>
+                        <th style="width:12%;text-align:center;">Normal</th>
+                        <th style="width:12%;text-align:center;">Abnormal</th>
+                        <th style="width:8%;text-align:center;">Flag</th>
+                        <th style="width:10%;text-align:center;">Units</th>
+                        <th style="width:26%;">Reference Range</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="sec-hdr"><td colspan="6">LABORATORY TEST RESULTS</td></tr>
+                    ${tableRows}
+                </tbody>
+            </table>
+            ${commentHtml}
+            <div class="lrpt-flag-key">
+                <span><b>Flag Key:</b></span>
+                <span><span class="lflag-L">L</span> = Abnormal Low</span>
+                <span><span class="lflag-H">H</span> = Abnormal High</span>
+                <span><span class="lflag-A">A</span> = Abnormal / Positive</span>
+                <span style="margin-left:auto;font-style:italic;font-size:0.68rem;">Results interpreted against HMS Laboratory reference ranges.</span>
+            </div>`;
+        })() : '';
+
+        return `
+        <div class="lab-report-card">
+            <!-- Header -->
+            <div class="lrpt-header">
+                <div>
+                    <div class="lab-name">HMS GLOBAL HOSPITAL — PATIENT VISIT RECORD</div>
+                    <div class="lab-addr">Ankara, Turkey &nbsp;|&nbsp; Tel: +90 800 HMS 0000 &nbsp;|&nbsp; records@hmsglobal.com</div>
+                </div>
+                <div class="rpt-meta">
+                    <strong>Record No: ${rptNo}</strong>
+                    <div>Printed: ${today}</div>
+                    <div>Physician: Dr. ${doctor}</div>
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="lrpt-title">Medical Visit Report — ${date}</div>
+
+            <!-- Patient info -->
+            <div class="lrpt-info-grid">
+                <div class="lrpt-info-cell"><label>Patient Name</label><span>${patName}</span></div>
+                <div class="lrpt-info-cell"><label>Date of Birth</label><span>${patDOB}</span></div>
+                <div class="lrpt-info-cell"><label>NIC / Patient ID</label><span>${patNIC} &nbsp;|&nbsp; ${patPID}</span></div>
+            </div>
+            <div class="lrpt-info-grid">
+                <div class="lrpt-info-cell"><label>Contact No.</label><span>${patTel}</span></div>
+                <div class="lrpt-info-cell"><label>Address</label><span>${patAddr}</span></div>
+                <div class="lrpt-info-cell"><label>Ordering Physician</label><span>Dr. ${doctor}</span></div>
+            </div>
+            <div class="lrpt-collect">
+                <div><label>Visit Date</label>${date}</div>
+                <div><label>Report Date</label>${today}</div>
+                <div><label>Department</label>${appo ? (appo.sname || 'General Medicine') : 'Laboratory'}</div>
+                <div><label>Tests Ordered</label>${labs.length || '—'}</div>
+            </div>
+
+            <!-- Visit info -->
+            ${visitHtml}
+
+            <!-- Lab results table -->
+            ${labTableHtml || `<div style="padding:14px;text-align:center;color:#aaa;font-family:'Segoe UI',sans-serif;font-size:0.82rem;">No laboratory tests recorded for this visit.</div>`}
+
+            <!-- Footer -->
+            <div class="lrpt-footer">
+                <div class="lrpt-sig">Authorized by: <strong>Dr. ${doctor} — HMS Global Hospital</strong></div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderRecord(data, me) {
+    const { profile, appointments, labResults } = data;
+    if (!profile) { document.getElementById('record-container').innerHTML = '<p style="color:red">Patient not found.</p>'; return; }
+
+    const dob     = profile.pdob ? profile.pdob.toString().slice(0,10) : '—';
+    const age     = profile.pdob ? Math.floor((Date.now() - new Date(profile.pdob)) / 3.154e10) : '—';
+    const visits  = appointments.filter(a => a.status !== 'CANCELLED').length;
+    const abnormal = labResults.filter(r => { const s = getStatus(r.notes); return s.cls === 'pill-high' || s.cls === 'pill-low' || s.cls === 'pill-positive'; }).length;
+    const normal   = labResults.filter(r => getStatus(r.notes).cls === 'pill-normal' || getStatus(r.notes).cls === 'pill-negative').length;
+    const lastVisit = appointments.filter(a=>a.status==='CHECKED_IN').map(a=>a.appodate?.toString().slice(0,10)).sort().pop() || '—';
+
+    // Build combined timeline
+    const timeline = [
+        ...appointments.map(a => ({ type:'appo', date: a.appodate?.toString().slice(0,10), data: a })),
+        ...labResults.map(r   => ({ type:'lab',  date: r.created_at?.toString().slice(0,10), data: r }))
+    ].sort((a,b) => b.date > a.date ? 1 : -1);
+
+    document.getElementById('record-container').innerHTML = `
+
+        <!-- Print Header -->
+        <div class="print-bar" style="margin-bottom:0;border-radius:14px 14px 0 0;">
+            <div>
+                <div style="font-weight:800;font-size:1.1rem;">HMS GLOBAL HOSPITAL — PATIENT HEALTH RECORD</div>
+                <div style="font-size:0.78rem;opacity:0.8;">Ankara, Turkey &nbsp;|&nbsp; +90 800 HMS 0000 &nbsp;|&nbsp; Confidential Medical Document</div>
+            </div>
+            <button onclick="window.print()" style="background:white;color:#0a3d62;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.85rem;">
+                <i class="fas fa-print"></i> Print Record
+            </button>
+        </div>
+
+        <!-- Patient Demographics -->
+        <div class="hr-card" style="border-radius:0 0 14px 14px;border-top:3px solid #007bff;">
+            <div class="section-title"><i class="fas fa-user-circle"></i> Patient Demographics</div>
+            <div style="display:flex;align-items:center;gap:20px;margin-bottom:18px;">
+                <div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#007bff,#0a3d62);display:flex;align-items:center;justify-content:center;color:white;font-size:1.6rem;font-weight:900;flex-shrink:0;">
+                    ${(profile.pname||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+                </div>
+                <div>
+                    <div style="font-size:1.5rem;font-weight:900;color:#0a3d62;">${profile.pname}</div>
+                    <div style="color:#666;font-size:0.85rem;">${profile.pemail} &nbsp;|&nbsp; Age: ${age} years</div>
+                </div>
+            </div>
+            <div class="info-grid">
+                <div class="info-cell"><label>Date of Birth</label><span>${dob}</span></div>
+                <div class="info-cell"><label>NIC / ID</label><span>${profile.pnic || '—'}</span></div>
+                <div class="info-cell"><label>Phone</label><span>${profile.ptel || '—'}</span></div>
+                <div class="info-cell"><label>Address</label><span>${profile.paddress || '—'}</span></div>
+                <div class="info-cell"><label>Patient ID</label><span>HMS-P-${String(profile.pid).padStart(5,'0')}</span></div>
+                <div class="info-cell"><label>Last Visit</label><span>${lastVisit}</span></div>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="hr-card">
+            <div class="section-title"><i class="fas fa-chart-bar"></i> Medical Summary</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+                <div class="summary-stat">
+                    <div class="num" style="color:#007bff;">${appointments.length}</div>
+                    <div class="lbl">Total Visits</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="num" style="color:#28a745;">${visits}</div>
+                    <div class="lbl">Completed</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="num" style="color:#ffc107;">${labResults.length}</div>
+                    <div class="lbl">Lab Tests</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="num" style="color:#dc3545;">${abnormal}</div>
+                    <div class="lbl">Abnormal Results</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Medical Timeline — formal report cards per visit -->
+        <div class="hr-card">
+            <div class="section-title"><i class="fas fa-history"></i> Full Medical Timeline</div>
+            ${buildTimeline(appointments, labResults, profile)}
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align:center;padding:16px;color:#aaa;letter-spacing:2px;font-family:'Courier New',monospace;font-size:0.75rem;">
+        </div>`;
+}
+
+init().catch(e => {
+    document.getElementById('record-container').innerHTML = `<p style="color:red;padding:40px;text-align:center;">Error loading record. Make sure the server is running.</p>`;
+});
+</script>
+</body>
+</html>

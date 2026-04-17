@@ -1,0 +1,490 @@
+/* ============================================
+   HMS GLOBAL — Professional Medical Theme
+   Inspired by Ahalia Hospital Design
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f4f6f8;
+    color: #2c3e50;
+}
+
+/* ============================================
+   COLOR VARIABLES
+   ============================================ */
+:root {
+    --primary:    #1a3a5c;
+    --secondary:  #2980b9;
+    --accent:     #27ae60;
+    --light-bg:   #f4f6f8;
+    --white:      #ffffff;
+    --border:     #dde3ea;
+    --text-dark:  #2c3e50;
+    --text-gray:  #6c7a89;
+    --danger:     #c0392b;
+    --warning:    #d35400;
+    --success:    #27ae60;
+    --sidebar-w:  260px;
+}
+
+/* ============================================
+   NAVBAR (Landing Page)
+   ============================================ */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 60px;
+    height: 70px;
+    background: var(--primary);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.logo {
+    color: white;
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.logo span {
+    font-weight: 300;
+    font-size: 0.75rem;
+    opacity: 0.75;
+    letter-spacing: 3px;
+    display: block;
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.hero {
+    height: 100vh;
+    width: 100%;
+    background: linear-gradient(rgba(26,58,92,0.82), rgba(26,58,92,0.82)),
+                url('/female_doctor.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding-top: 70px;
+}
+
+.hero-content {
+    max-width: 800px;
+    padding: 20px;
+}
+
+.hero-content h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.hero-content p {
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+    opacity: 0.9;
+    line-height: 1.7;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn-blue {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 4px;
+}
+
+.btn-blue:hover { background: var(--secondary); }
+
+.btn-row {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.btn-reset {
+    background: #ecf0f1;
+    color: var(--text-dark);
+    border: none;
+    flex: 1;
+    padding: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.btn-reset:hover { background: var(--border); }
+
+/* ============================================
+   NAV BUTTONS (Sidebar)
+   ============================================ */
+.btn-nav {
+    background: transparent;
+    border: none;
+    color: #95a5a6;
+    padding: 11px 15px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+}
+
+.btn-nav:hover {
+    background: rgba(255,255,255,0.08);
+    color: white;
+}
+
+.btn-nav.dark {
+    color: var(--text-gray);
+    background: transparent;
+    border: none;
+}
+
+.btn-nav.dark:hover {
+    background: #eaf0f6;
+    color: var(--primary);
+}
+
+/* ============================================
+   AUTH PAGES
+   ============================================ */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eaf0f6;
+    padding: 20px;
+}
+
+.auth-card {
+    background: white;
+    padding: 45px 50px;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+    border-top: 4px solid var(--primary);
+}
+
+.auth-card h2 {
+    font-size: 1.8rem;
+    color: var(--primary);
+    margin-bottom: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.subtitle {
+    color: var(--text-gray);
+    display: block;
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+.form-group {
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.82rem;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    color: var(--text-dark);
+    background: white;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(41,128,185,0.1);
+}
+
+/* ============================================
+   DASHBOARD LAYOUT
+   ============================================ */
+.dashboard-body {
+    display: flex;
+    min-height: 100vh;
+    background: var(--light-bg);
+}
+
+.sidebar {
+    width: var(--sidebar-w);
+    background: var(--primary);
+    padding: 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+}
+
+.sidebar .logo {
+    color: white;
+    padding: 25px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 0;
+    display: block;
+    background: rgba(0,0,0,0.15);
+}
+
+.sidebar nav {
+    padding: 15px 10px;
+}
+
+.sidebar .btn-nav.dark {
+    color: rgba(255,255,255,0.7);
+    border-radius: 4px;
+    padding: 11px 14px;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.sidebar .btn-nav.dark:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.main-content {
+    flex: 1;
+    padding: 35px 45px;
+    background: var(--light-bg);
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+.card {
+    background: white;
+    border-radius: 4px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+}
+
+/* ============================================
+   CHATBOT
+   ============================================ */
+.chat-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 55px;
+    height: 55px;
+    background: var(--primary);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(26,58,92,0.4);
+    z-index: 9999;
+    transition: background 0.3s;
+}
+
+.chat-btn:hover { background: var(--secondary); }
+
+.chat-window {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 350px;
+    height: 460px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9999;
+    border: 1px solid var(--border);
+}
+
+.chat-header {
+    background: var(--primary);
+    color: white;
+    padding: 16px 20px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 18px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-footer {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    background: white;
+}
+
+.chat-footer input {
+    flex: 1;
+    padding: 10px 12px;
+    margin: 0;
+    border-radius: 4px 0 0 4px;
+    border-right: none;
+    font-size: 0.9rem;
+}
+
+.chat-footer button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.chat-footer button:hover { background: var(--secondary); }
+
+.msg {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 4px;
+    max-width: 88%;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.bot-msg {
+    background: white;
+    color: var(--text-dark);
+    align-self: flex-start;
+    border: 1px solid var(--border);
+}
+
+.user-msg {
+    background: var(--primary);
+    color: white;
+    align-self: flex-end;
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* ============================================
+   BACK BUTTON
+   ============================================ */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--text-gray);
+    padding: 9px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    transition: 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.back-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .sidebar { width: 100%; height: auto; position: relative; }
+    .main-content { margin-left: 0; padding: 20px; }
+    .hero-content h1 { font-size: 2rem; }
+    .auth-card { padding: 30px 20px; }
+    .chat-window { width: 95vw; right: 2.5vw; }
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+@media print {
+    .sidebar, .chat-btn, .chat-window, .back-btn { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+}

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | My Bookings</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .filter-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+        }
+        .filter-input {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        .filter-input:focus { border-color: #007bff; }
+        .status-tab {
+            padding: 8px 18px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.3s;
+            color: #666;
+        }
+        .status-tab.active, .status-tab:hover {
+            border-color: #007bff;
+            background: #007bff;
+            color: white;
+        }
+        .booking-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: 0.3s;
+            border-left: 5px solid #007bff;
+        }
+        .booking-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .booking-card.cancelled { border-left-color: #dc3545; }
+        .booking-card.checked   { border-left-color: #28a745; }
+        .booking-card.completed { border-left-color: #6f42c1; }
+        .booking-avatar {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #555;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: #f0f2f5;
+            border-color: #007bff;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="sidebar">
+        <div class="logo" style="margin-bottom:30px; text-align:center;">
+            <img src="/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+        </div>
+        <nav style="display:flex; flex-direction:column; gap:15px;">
+            <a href="/dashboard" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+            <a href="/book" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-calendar-plus"></i> Book Appointment
+            </a>
+            <a href="/doctors" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-user-md"></i> All Doctors
+            </a>
+            <a href="/mybookings" class="btn-nav dark"
+               style="justify-content:flex-start; background:#e7f1ff; color:#007bff;">
+                <i class="fas fa-list"></i> My Bookings
+            </a>
+            <a href="/results" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-flask"></i> Lab Results
+            </a>
+            <a href="/settings" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+            <a href="/logout" class="btn-nav dark" style="justify-content:flex-start; color:#dc3545;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+
+        <!-- Back Button -->
+        <button onclick="history.back()" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+
+        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <div>
+                <h1 style="font-size:1.8rem;">
+                    <i class="fas fa-list" style="color:#007bff;"></i> My Bookings
+                </h1>
+                <p style="color:#666;">View and manage all your appointments</p>
+            </div>
+            <button class="btn-blue" style="width:auto; padding:12px 25px;"
+                onclick="location.href='/book'">
+                <i class="fas fa-plus"></i> New Booking
+            </button>
+        </header>
+
+        <!-- Stats -->
+        <div style="display:flex; gap:15px; margin-bottom:25px;">
+            <div style="background:white; border-radius:12px; padding:20px; flex:1;
+                        box-shadow:0 3px 10px rgba(0,0,0,0.06); text-align:center;">
+                <p style="font-size:1.8rem; font-weight:800; color:#007bff; margin:0;"
+                   id="count-all">0</p>
+                <p style="color:#666; font-size:0.85rem; margin:5px 0 0;">Total</p>
+            </div>
+            <div style="background:white; border-radius:12px; padding:20px; flex:1;
+                        box-shadow:0 3px 10px rgba(0,0,0,0.06); text-align:center;">
+                <p style="font-size:1.8rem; font-weight:800; color:#007bff; margin:0;"
+                   id="count-booked">0</p>
+                <p style="color:#666; font-size:0.85rem; margin:5px 0 0;">Booked</p>
+            </div>
+            <div style="background:white; border-radius:12px; padding:20px; flex:1;
+                        box-shadow:0 3px 10px rgba(0,0,0,0.06); text-align:center;">
+                <p style="font-size:1.8rem; font-weight:800; color:#28a745; margin:0;"
+                   id="count-checked">0</p>
+                <p style="color:#666; font-size:0.85rem; margin:5px 0 0;">Checked In</p>
+            </div>
+            <div style="background:white; border-radius:12px; padding:20px; flex:1;
+                        box-shadow:0 3px 10px rgba(0,0,0,0.06); text-align:center;">
+                <p style="font-size:1.8rem; font-weight:800; color:#6f42c1; margin:0;"
+                   id="count-completed">0</p>
+                <p style="color:#666; font-size:0.85rem; margin:5px 0 0;">Completed</p>
+            </div>
+            <div style="background:white; border-radius:12px; padding:20px; flex:1;
+                        box-shadow:0 3px 10px rgba(0,0,0,0.06); text-align:center;">
+                <p style="font-size:1.8rem; font-weight:800; color:#dc3545; margin:0;"
+                   id="count-cancelled">0</p>
+                <p style="color:#666; font-size:0.85rem; margin:5px 0 0;">Cancelled</p>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <i class="fas fa-filter" style="color:#007bff;"></i>
+            <input type="date" class="filter-input" id="date-filter"
+                   onchange="applyFilters()">
+            <button class="status-tab active" onclick="setStatus('ALL', this)">All</button>
+            <button class="status-tab" onclick="setStatus('BOOKED', this)">🔵 Booked</button>
+            <button class="status-tab" onclick="setStatus('CHECKED_IN', this)">🟢 Checked In</button>
+            <button class="status-tab" onclick="setStatus('COMPLETED', this)">🟣 Completed</button>
+            <button class="status-tab" onclick="setStatus('CANCELLED', this)">🔴 Cancelled</button>
+            <button onclick="clearFilters()"
+                style="padding:8px 18px; background:#f0f2f5; border:none; border-radius:20px;
+                       cursor:pointer; font-size:0.85rem; font-weight:600;
+                       color:#666; margin-left:auto;">
+                <i class="fas fa-times"></i> Clear
+            </button>
+        </div>
+
+        <!-- Bookings List -->
+        <div id="bookings-list">
+            <div style="text-align:center; padding:60px; color:#666;">
+                ⏳ Loading your bookings...
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-btn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span>🏥 HMS AI Assistant</span>
+            <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="msg bot-msg">
+                👋 Hello! I can see all your bookings and appointments. Ask me anything like <b>"Do I have any upcoming appointments?"</b> or <b>"What is my next appointment?"</b>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Ask about your bookings...">
+            <button onclick="handleChat()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
+    <script>
+        let allBookings = [];
+        let currentStatus = 'ALL';
+
+        async function loadBookings() {
+            try {
+                const res = await fetch('/api/appointments');
+                allBookings = await res.json();
+
+                document.getElementById('count-all').innerText = allBookings.length;
+                document.getElementById('count-booked').innerText =
+                    allBookings.filter(a => a.status === 'BOOKED').length;
+                document.getElementById('count-checked').innerText =
+                    allBookings.filter(a => a.status === 'CHECKED_IN').length;
+                document.getElementById('count-completed').innerText =
+                    allBookings.filter(a => a.status === 'COMPLETED').length;
+                document.getElementById('count-cancelled').innerText =
+                    allBookings.filter(a => a.status === 'CANCELLED').length;
+
+                renderBookings(allBookings);
+            } catch(e) {
+                document.getElementById('bookings-list').innerHTML =
+                    '<p style="text-align:center; color:red; padding:40px;">❌ Error loading bookings.</p>';
+            }
+        }
+
+        function setStatus(status, btn) {
+            currentStatus = status;
+            document.querySelectorAll('.status-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const dateFilter = document.getElementById('date-filter').value;
+            let filtered = allBookings;
+            if (currentStatus !== 'ALL') {
+                filtered = filtered.filter(a => a.status === currentStatus);
+            }
+            if (dateFilter) {
+                filtered = filtered.filter(a =>
+                    a.appodate && a.appodate.toString().slice(0,10) === dateFilter
+                );
+            }
+            renderBookings(filtered);
+        }
+
+        function clearFilters() {
+            currentStatus = 'ALL';
+            document.getElementById('date-filter').value = '';
+            document.querySelectorAll('.status-tab').forEach(b => b.classList.remove('active'));
+            document.querySelector('.status-tab').classList.add('active');
+            renderBookings(allBookings);
+        }
+
+        function renderBookings(bookings) {
+            const list = document.getElementById('bookings-list');
+
+            if (bookings.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align:center; padding:60px; color:#666;">
+                        <i class="fas fa-calendar-times"
+                           style="font-size:3rem; color:#ddd; margin-bottom:15px; display:block;"></i>
+                        <p style="font-size:1.1rem;">No bookings found.</p>
+                        <a href="/book" style="color:#007bff; font-weight:600;">
+                            Book an appointment →
+                        </a>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = bookings.map(a => {
+                const date = a.appodate ? a.appodate.toString().slice(0,10) : 'N/A';
+                const statusColor = a.status === 'BOOKED'    ? '#007bff' :
+                                   a.status === 'CHECKED_IN' ? '#28a745' :
+                                   a.status === 'COMPLETED'  ? '#6f42c1' : '#dc3545';
+                const cardClass = a.status === 'CANCELLED'  ? 'cancelled' :
+                                  a.status === 'CHECKED_IN' ? 'checked'   :
+                                  a.status === 'COMPLETED'  ? 'completed' : '';
+
+                return `
+                    <div class="booking-card ${cardClass}">
+                        <div class="booking-avatar"
+                             style="background:linear-gradient(135deg,${statusColor},${statusColor}cc)">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <h3 style="margin:0; font-size:1.05rem;">${a.docname}</h3>
+                            <p style="margin:4px 0; color:#666; font-size:0.9rem;">
+                                🩺 ${a.sname || 'General Practice'}
+                            </p>
+                            <p style="margin:4px 0; color:#888; font-size:0.85rem;">
+                                📅 ${date} &nbsp;|&nbsp;
+                                🔖 Ref: <b>HMS-${String(a.appoid).padStart(4,'0')}</b>
+                            </p>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="background:${statusColor}22; color:${statusColor};
+                                  padding:6px 15px; border-radius:20px; font-size:0.85rem;
+                                  font-weight:600; display:block; margin-bottom:10px;">
+                                ${a.status}
+                            </span>
+                            ${a.status === 'BOOKED' ? `
+                            <button onclick="cancelBooking(${a.appoid})"
+                                style="background:#fff0f0; color:#dc3545; border:1px solid #dc3545;
+                                       padding:6px 14px; border-radius:8px; cursor:pointer;
+                                       font-size:0.8rem; font-weight:600;">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>` : ''}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function cancelBooking(appoid) {
+            if (!confirm('Cancel this appointment?')) return;
+            try {
+                const res = await fetch(`/api/appointments/cancel/${appoid}`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ Appointment cancelled!');
+                    loadBookings();
+                }
+            } catch(e) { alert('Error cancelling appointment.'); }
+        }
+
+        loadBookings();
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls c:/Users/Hafsa/Desktop/hospital-backend/*.jpg c:/Users/Hafsa/Desktop/hospital-backend/*.png c:/Users/Hafsa/Desktop/hospital-backend/*.jpeg)",
+      "Bash(mysql -u root -phms123 hospital_management -e \"SELECT pid, pname, pemail, ppassword FROM patient;\")",
+      "Bash(mysql -u root -phms123 hospital_management -e \"SELECT a.appoid, a.pid, a.scheduleid, a.status, p.pname, d.docname FROM appointment a JOIN patient p ON a.pid=p.pid JOIN doctor d ON a.scheduleid=d.docid;\")",
+      "Bash(mysql -u root -phms123 hospital_management -e \"SELECT * FROM webuser WHERE usertype='p';\")",
+      "Bash(mysql -u root -phms123 hospital_management -e \"DELETE FROM webuser WHERE usertype='p' AND email NOT IN \\(SELECT pemail FROM patient\\);\")",
+      "Bash(mysql -u root -phms123 hospital_management -e \"SELECT email, usertype FROM webuser;\")",
+      "Bash(mysql -u root -phms123 hospital_management -e ':*)",
+      "Bash(mysql -u root -phms123 hospital_management -e \"DESCRIBE doctor;\")",
+      "Bash(mysql -u root -phms123 hospital_management -e \"SELECT docid, docname, docemail FROM doctor LIMIT 10;\")",
+      "Bash(mysql -u root -phms123 hospital_management -e \"SELECT COUNT\\(*\\) as total FROM doctor;\")",
+      "Bash(mysql -u root -phms123 hospital_management -e \"SELECT docid, country, city, hospital_branch, available FROM doctor WHERE specialties = \\(SELECT id FROM specialties LIMIT 1\\) LIMIT 5;\")",
+      "Bash(mysql -u root -phms123 hospital_management -e \"SELECT COUNT\\(*\\) as nulls FROM doctor WHERE hospital_branch IS NULL OR country IS NULL;\")",
+      "Bash(python3 -c ':*)",
+      "Bash(node -e ':*)",
+      "Bash(mysql -u root -p hospital_management -e \"DESCRIBE appointment; DESCRIBE doctor;\")",
+      "Bash(ls -la /c/Users/Hafsa/Desktop/hospital-backend/*.sql)",
+      "Bash(ls -lh /c/Users/Hafsa/Desktop/hospital-backend/*.html)"
+    ]
+  }
+}

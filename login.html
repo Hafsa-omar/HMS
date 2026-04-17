@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Welcome Back</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="auth-page">
+
+    <div class="nav-controls">
+        <button onclick="history.back()" class="btn-nav dark">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+        <a href="/" class="btn-nav dark">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </div>
+
+    <div class="auth-card">
+
+        <img src="/logo.png" alt="HMS" style="width:180px; margin-bottom:10px;">
+        <h2 id="login-title">Welcome Back!</h2>
+        <span class="subtitle" id="login-subtitle">Login with your details to continue</span>
+
+        <form action="/auth/login" method="POST">
+
+            <div class="form-group">
+                <label><i class="fas fa-envelope" style="color:#007bff;"></i> Email Address:</label>
+                <input type="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-lock" style="color:#007bff;"></i> Password:</label>
+                <input type="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn-blue">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+
+            <p style="margin-top: 25px; font-size: 0.9rem; color: #666;">
+                Don't have an account? 
+                <a href="/register" style="color: #007bff; text-decoration: none; font-weight: 600;">Sign Up</a>
+            </p>
+
+        </form>
+
+        <!-- Quick Login Helper for Demo -->
+        <div style="margin-top:25px; padding:15px; background:#f8f9fa; border-radius:10px; text-align:left;">
+            <p style="font-size:0.8rem; font-weight:700; color:#666; margin-bottom:10px;">
+                🧪 Demo Accounts:
+            </p>
+            <p style="font-size:0.8rem; color:#888; margin:4px 0;">
+                👤 Patient: <b>demo@hms.com</b> / <b>123</b>
+            </p>
+            <p style="font-size:0.8rem; color:#888; margin:4px 0;">
+                👨‍⚕️ Doctor: <b>doctor1@hms.com</b> / <b>123</b>
+            </p>
+        </div>
+
+    </div>
+
+    <div class="chat-btn" onclick="toggleChat()">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span>HMS AI Assistant</span>
+            <i class="fas fa-times" onclick="toggleChat()" style="cursor: pointer; opacity: 0.8;"></i>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="msg bot-msg">Need help logging in? I can assist you!</div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button onclick="handleChat()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const role = params.get('role');
+            const title = document.getElementById('login-title');
+            const subtitle = document.getElementById('login-subtitle');
+
+            if (role === 'doctor') {
+                title.innerText = "Doctor Staff Login";
+                subtitle.innerText = "Access the clinical management portal";
+                document.querySelector('.auth-card').style.borderTop = "5px solid #007bff";
+            } else if (role === 'patient') {
+                title.innerText = "Patient Vault Login";
+                subtitle.innerText = "Securely access your medical records";
+                document.querySelector('.auth-card').style.borderTop = "5px solid #28a745";
+            }
+        };
+
+        function toggleChat() {
+            const chat = document.getElementById('chatWindow');
+            chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
+        }
+    </script>
+    <script src="chatbot.js"></script>
+
+</body>
+</html>

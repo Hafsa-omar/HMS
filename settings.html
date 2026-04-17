@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Settings</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .settings-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            color: #333;
+        }
+        .settings-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .settings-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-bg.active { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            animation: popIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+        .form-input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        .info-row {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f2f5;
+            align-items: center;
+        }
+        .info-label {
+            width: 140px;
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 600;
+        }
+        .info-value {
+            flex: 1;
+            font-size: 0.95rem;
+            color: #333;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #555;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: #f0f2f5;
+            border-color: #007bff;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="sidebar">
+        <div class="logo" style="margin-bottom:30px; text-align:center;">
+            <img src="/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+        </div>
+        <nav style="display:flex; flex-direction:column; gap:15px;">
+            <a href="/dashboard" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+            <a href="/book" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-calendar-plus"></i> Book Appointment
+            </a>
+            <a href="/doctors" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-user-md"></i> All Doctors
+            </a>
+            <a href="/mybookings" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-list"></i> My Bookings
+            </a>
+            <a href="/results" class="btn-nav dark" style="justify-content:flex-start;">
+                <i class="fas fa-flask"></i> Lab Results
+            </a>
+            <a href="/settings" class="btn-nav dark"
+               style="justify-content:flex-start; background:#e7f1ff; color:#007bff;">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+            <a href="/logout" class="btn-nav dark" style="justify-content:flex-start; color:#dc3545;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+
+        <!-- Back Button -->
+        <button onclick="history.back()" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+
+        <header style="margin-bottom:30px;">
+            <h1 style="font-size:1.8rem;">
+                <i class="fas fa-cog" style="color:#007bff;"></i> Settings
+            </h1>
+            <p style="color:#666;">Manage your account preferences</p>
+        </header>
+
+        <!-- Profile Banner -->
+        <div style="background:linear-gradient(135deg,#007bff,#0056b3); border-radius:15px;
+                    padding:25px; color:white; display:flex; align-items:center;
+                    gap:20px; margin-bottom:30px;">
+            <div style="width:70px; height:70px; background:rgba(255,255,255,0.2);
+                        border-radius:50%; display:flex; align-items:center;
+                        justify-content:center; font-size:2rem;">
+                <i class="fas fa-user"></i>
+            </div>
+            <div>
+                <h2 id="profile-name" style="margin:0; font-size:1.3rem;">Loading...</h2>
+                <p id="profile-email" style="margin:4px 0 0; opacity:0.8; font-size:0.9rem;"></p>
+                <p style="margin:3px 0 0; opacity:0.7; font-size:0.85rem;">
+                    ✅ Active Patient
+                </p>
+            </div>
+            <div style="margin-left:auto;">
+                <span style="background:rgba(255,255,255,0.2); padding:6px 16px;
+                             border-radius:20px; font-size:0.85rem; font-weight:600;">
+                    👤 Patient
+                </span>
+            </div>
+        </div>
+
+        <!-- Settings Options -->
+        <div onclick="openEditModal()" class="settings-card">
+            <div class="settings-icon" style="background:#e7f1ff; color:#007bff;">
+                <i class="fas fa-edit"></i>
+            </div>
+            <div>
+                <h3 style="margin:0; font-size:1rem;">Account Settings</h3>
+                <p style="margin:3px 0 0; color:#666; font-size:0.85rem;">
+                    Edit your personal details & change password
+                </p>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
+        </div>
+
+        <div onclick="openViewModal()" class="settings-card">
+            <div class="settings-icon" style="background:#e6f9ee; color:#28a745;">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div>
+                <h3 style="margin:0; font-size:1rem;">View Account Details</h3>
+                <p style="margin:3px 0 0; color:#666; font-size:0.85rem;">
+                    View all your personal information
+                </p>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
+        </div>
+
+        <div onclick="location.href='/mybookings'" class="settings-card">
+            <div class="settings-icon" style="background:#fff3e0; color:#ff9800;">
+                <i class="fas fa-list"></i>
+            </div>
+            <div>
+                <h3 style="margin:0; font-size:1rem;">My Bookings</h3>
+                <p style="margin:3px 0 0; color:#666; font-size:0.85rem;">
+                    View and manage all your appointments
+                </p>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
+        </div>
+
+        <div onclick="location.href='/results'" class="settings-card">
+            <div class="settings-icon" style="background:#e8f5e9; color:#28a745;">
+                <i class="fas fa-flask"></i>
+            </div>
+            <div>
+                <h3 style="margin:0; font-size:1rem;">Lab Results</h3>
+                <p style="margin:3px 0 0; color:#666; font-size:0.85rem;">
+                    View your medical test results
+                </p>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
+        </div>
+
+        <div onclick="toggleChat()" class="settings-card">
+            <div class="settings-icon" style="background:#e7f1ff; color:#007bff;">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div>
+                <h3 style="margin:0; font-size:1rem;">AI Assistant</h3>
+                <p style="margin:3px 0 0; color:#666; font-size:0.85rem;">
+                    Chat with HMS AI — ask about your appointments & results
+                </p>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
+        </div>
+
+        <div onclick="openDeleteModal()" class="settings-card">
+            <div class="settings-icon" style="background:#fde8e8; color:#dc3545;">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <div>
+                <h3 style="margin:0; font-size:1rem; color:#dc3545;">Delete Account</h3>
+                <p style="margin:3px 0 0; color:#666; font-size:0.85rem;">
+                    Permanently remove your account and data
+                </p>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal-bg" id="editModal">
+        <div class="modal-box">
+            <h2 style="margin-bottom:5px;">
+                <i class="fas fa-edit" style="color:#007bff;"></i> Edit Account
+            </h2>
+            <p style="color:#666; font-size:0.9rem; margin-bottom:25px;">
+                Update your personal information
+            </p>
+            <input class="form-input" id="edit-name" placeholder="Full Name">
+            <input class="form-input" id="edit-address" placeholder="Address">
+            <input class="form-input" id="edit-tel" placeholder="Phone Number">
+            <input class="form-input" id="edit-password"
+                   placeholder="New Password (leave empty to keep current)"
+                   type="password">
+            <div style="display:flex; gap:10px;">
+                <button onclick="closeAll()"
+                    style="flex:1; padding:13px; background:#f0f2f5; border:none;
+                           border-radius:8px; cursor:pointer; font-weight:600;">
+                    Cancel
+                </button>
+                <button onclick="saveChanges()"
+                    style="flex:1; padding:13px; background:#007bff; color:white;
+                           border:none; border-radius:8px; cursor:pointer; font-weight:600;">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW MODAL -->
+    <div class="modal-bg" id="viewModal">
+        <div class="modal-box">
+            <h2 style="margin-bottom:20px;">
+                <i class="fas fa-eye" style="color:#28a745;"></i> Account Details
+            </h2>
+            <div id="view-content"></div>
+            <button onclick="closeAll()"
+                style="width:100%; padding:13px; background:#007bff; color:white;
+                       border:none; border-radius:8px; cursor:pointer;
+                       font-weight:600; margin-top:20px;">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div class="modal-bg" id="deleteModal">
+        <div class="modal-box" style="text-align:center;">
+            <div style="font-size:3rem; color:#dc3545; margin-bottom:15px;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 style="color:#dc3545; margin-bottom:10px;">Delete Account?</h2>
+            <p style="color:#666; margin-bottom:25px;">
+                This will <b>permanently delete</b> your account and all your appointments.
+                This cannot be undone!
+            </p>
+            <div style="display:flex; gap:10px;">
+                <button onclick="closeAll()"
+                    style="flex:1; padding:13px; background:#f0f2f5; border:none;
+                           border-radius:8px; cursor:pointer; font-weight:600;">
+                    Cancel
+                </button>
+                <button onclick="deleteAccount()"
+                    style="flex:1; padding:13px; background:#dc3545; color:white;
+                           border:none; border-radius:8px; cursor:pointer; font-weight:600;">
+                    <i class="fas fa-trash"></i> Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-btn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span>🏥 HMS AI Assistant</span>
+            <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="msg bot-msg">
+                👋 Hello! I can help you manage your account. Ask me anything like <b>"How do I change my password?"</b> or <b>"Show me my appointments"</b>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Ask me anything...">
+            <button onclick="handleChat()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
+    <script>
+        async function loadUser() {
+            try {
+                const res = await fetch('/api/me');
+                const currentUser = await res.json();
+                document.getElementById('profile-name').innerText = currentUser.name;
+                document.getElementById('profile-email').innerText = '✉️ ' + currentUser.email;
+
+                const detRes = await fetch('/api/patient/profile');
+                const details = await detRes.json();
+                if (details) {
+                    document.getElementById('edit-name').value    = details.pname    || '';
+                    document.getElementById('edit-address').value = details.paddress || '';
+                    document.getElementById('edit-tel').value     = details.ptel     || '';
+                }
+            } catch(e) {
+                window.location.href = '/login';
+            }
+        }
+
+        function openEditModal() {
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        async function openViewModal() {
+            try {
+                const res = await fetch('/api/patient/profile');
+                const p = await res.json();
+                const dob = p.pdob ? p.pdob.toString().slice(0,10) : 'N/A';
+                document.getElementById('view-content').innerHTML = `
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-user" style="color:#007bff;"></i> Full Name
+                        </div>
+                        <div class="info-value">${p.pname || 'N/A'}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-envelope" style="color:#007bff;"></i> Email
+                        </div>
+                        <div class="info-value">${p.pemail || 'N/A'}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-phone" style="color:#007bff;"></i> Phone
+                        </div>
+                        <div class="info-value">${p.ptel || 'N/A'}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-home" style="color:#007bff;"></i> Address
+                        </div>
+                        <div class="info-value">${p.paddress || 'N/A'}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-id-card" style="color:#007bff;"></i> NIC
+                        </div>
+                        <div class="info-value">${p.pnic || 'N/A'}</div>
+                    </div>
+                    <div class="info-row" style="border:none;">
+                        <div class="info-label">
+                            <i class="fas fa-birthday-cake" style="color:#007bff;"></i> DOB
+                        </div>
+                        <div class="info-value">${dob}</div>
+                    </div>`;
+                document.getElementById('viewModal').classList.add('active');
+            } catch(e) { alert('Error loading profile.'); }
+        }
+
+        function openDeleteModal() {
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeAll() {
+            document.querySelectorAll('.modal-bg').forEach(m => m.classList.remove('active'));
+        }
+
+        async function saveChanges() {
+            const data = {
+                pname:    document.getElementById('edit-name').value.trim(),
+                paddress: document.getElementById('edit-address').value.trim(),
+                ptel:     document.getElementById('edit-tel').value.trim(),
+                password: document.getElementById('edit-password').value.trim()
+            };
+            if (!data.pname) { alert('Name cannot be empty!'); return; }
+            try {
+                const res = await fetch('/api/patient/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert('✅ Profile updated successfully!');
+                    closeAll();
+                    loadUser();
+                }
+            } catch(e) { alert('Error updating profile.'); }
+        }
+
+        async function deleteAccount() {
+            try {
+                const res = await fetch('/api/patient/delete', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Account deleted. Goodbye!');
+                    window.location.href = '/logout';
+                }
+            } catch(e) { alert('Error deleting account.'); }
+        }
+
+        loadUser();
+    </script>
+</body>
+</html>

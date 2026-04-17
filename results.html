@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Lab Results</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* ── Page shell ── */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: white; border: 2px solid #e0e0e0; color: #555;
+            padding: 10px 20px; border-radius: 10px; cursor: pointer;
+            font-weight: 600; font-size: 0.9rem; margin-bottom: 20px;
+            text-decoration: none; transition: 0.2s;
+        }
+        .back-btn:hover { border-color: #007bff; color: #007bff; }
+
+        /* ── Report card ── */
+        .report-card {
+            background: white;
+            border: 1px solid #aaa;
+            margin-bottom: 36px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.84rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+            page-break-inside: avoid;
+        }
+
+        /* Header bar */
+        .rpt-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 12px 18px;
+            border-bottom: 2px solid #222;
+        }
+        .rpt-header .lab-name {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 1rem; font-weight: 800; color: #111;
+        }
+        .rpt-header .lab-addr {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.72rem; color: #555; margin-top: 2px;
+        }
+        .rpt-header .rpt-meta {
+            text-align: right; font-size: 0.75rem;
+            font-family: 'Segoe UI', sans-serif; color: #333;
+        }
+        .rpt-header .rpt-meta strong { font-size: 0.85rem; color: #000; }
+
+        /* Title strip */
+        .rpt-title {
+            background: #f0f0f0;
+            border-top: 1px solid #999; border-bottom: 2px solid #222;
+            text-align: center; padding: 5px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem; font-weight: 800;
+            letter-spacing: 2px; text-transform: uppercase; color: #111;
+        }
+
+        /* Patient info rows */
+        .rpt-info-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            border-bottom: 1px solid #aaa;
+        }
+        .rpt-info-cell {
+            padding: 6px 12px; border-right: 1px solid #aaa; font-size: 0.8rem;
+        }
+        .rpt-info-cell:last-child { border-right: none; }
+        .rpt-info-cell label {
+            display: block; font-size: 0.65rem; text-transform: uppercase;
+            color: #666; margin-bottom: 2px; font-family: 'Segoe UI', sans-serif;
+        }
+        .rpt-info-cell span { font-weight: 700; color: #111; }
+
+        /* Collection row */
+        .rpt-collect {
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+            background: #f8f8f8; border-bottom: 2px solid #333;
+        }
+        .rpt-collect div {
+            padding: 5px 12px; border-right: 1px solid #aaa; font-size: 0.78rem;
+        }
+        .rpt-collect div:last-child { border-right: none; }
+        .rpt-collect div label {
+            display: block; font-size: 0.62rem; text-transform: uppercase;
+            color: #777; margin-bottom: 2px; font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Result table */
+        .rpt-table {
+            width: 100%; border-collapse: collapse;
+        }
+        .rpt-table thead tr {
+            background: #e0e0e0; border-bottom: 2px solid #333;
+        }
+        .rpt-table th {
+            padding: 6px 10px; text-align: left; font-size: 0.75rem;
+            text-transform: uppercase; font-family: 'Segoe UI', sans-serif;
+            color: #222; border-right: 1px solid #aaa; font-weight: 800;
+        }
+        .rpt-table th:last-child { border-right: none; }
+        .rpt-table td {
+            padding: 6px 10px; border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd; vertical-align: middle;
+        }
+        .rpt-table td:last-child { border-right: none; }
+        .rpt-table .section-hdr td {
+            background: #e8e8e8; font-weight: 800;
+            font-family: 'Segoe UI', sans-serif; font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 1px; color: #333;
+            border-top: 1px solid #aaa;
+        }
+        .rpt-table tr:nth-child(even):not(.section-hdr) td { background: #fafafa; }
+
+        /* Flag colours */
+        .flag-H { color: #cc0000; font-weight: 900; font-size: 0.9rem; }
+        .flag-L { color: #cc6600; font-weight: 900; font-size: 0.9rem; }
+        .flag-A { color: #6600aa; font-weight: 900; font-size: 0.9rem; }
+        .flag-star { color: #cc0000; font-size: 0.7rem; vertical-align: super; }
+
+        .val-abnormal { color: #cc0000; font-weight: 700; }
+        .val-normal   { color: #111; }
+
+        /* Notes / comment block */
+        .rpt-comment {
+            padding: 8px 14px; border-top: 1px dashed #aaa;
+            background: #fffdf0; font-size: 0.8rem; color: #333;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .rpt-comment .comment-label {
+            font-weight: 800; text-transform: uppercase; font-size: 0.72rem;
+            color: #555; margin-bottom: 4px;
+        }
+
+        /* Flag key */
+        .rpt-flag-key {
+            border-top: 1px solid #aaa; background: #f5f5f5;
+            padding: 6px 14px; font-size: 0.74rem;
+            font-family: 'Segoe UI', sans-serif; color: #555;
+            display: flex; gap: 20px; flex-wrap: wrap;
+        }
+
+        /* Footer */
+        .rpt-footer {
+            border-top: 2px solid #222;
+            padding: 8px 14px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .rpt-sig { font-size: 0.78rem; color: #444; }
+        .rpt-sig strong { display: block; color: #000; font-size: 0.85rem; }
+
+        .rpt-end {
+            text-align: center; padding: 5px;
+            border-top: 1px solid #ddd;
+            font-size: 0.72rem; color: #777; letter-spacing: 2px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Top summary bar */
+        .summary-bar {
+            display: flex; gap: 15px; margin-bottom: 22px; flex-wrap: wrap;
+        }
+        .summary-card {
+            background: white; border-radius: 12px; padding: 18px 22px; flex: 1;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07); min-width: 120px; text-align: center;
+        }
+        .summary-card .num { font-size: 2rem; font-weight: 900; margin: 0; }
+        .summary-card .lbl { font-size: 0.8rem; color: #777; margin-top: 4px; }
+
+        /* Print button */
+        .print-btn {
+            background: #222; color: white; border: none; padding: 7px 16px;
+            border-radius: 4px; cursor: pointer; font-size: 0.78rem; font-weight: 600;
+            font-family: 'Segoe UI', sans-serif; transition: 0.2s;
+        }
+        .print-btn:hover { background: #c00; }
+
+        /* Filter chips */
+        .filter-chip {
+            padding: 6px 15px; border: 2px solid #ccc; background: white;
+            border-radius: 20px; cursor: pointer; font-size: 0.82rem;
+            font-weight: 600; transition: 0.2s; color: #555;
+        }
+        .filter-chip.active { border-color: #333; background: #333; color: white; }
+
+        @media print {
+            .sidebar, .back-btn, .chat-btn, .chat-window,
+            .no-print, .print-btn { display: none !important; }
+            .main-content { margin-left: 0 !important; }
+            body { background: white; }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="sidebar">
+        <div class="logo" style="margin-bottom:30px; text-align:center;">
+            <img src="/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+        </div>
+        <nav style="display:flex; flex-direction:column; gap:15px;">
+            <a href="/dashboard"   class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/book"        class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-calendar-plus"></i> Book Appointment</a>
+            <a href="/doctors"     class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-user-md"></i> All Doctors</a>
+            <a href="/mybookings"  class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-list"></i> My Bookings</a>
+            <a href="/healthrecord" class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-notes-medical"></i> Health Record</a>
+            <a href="/results"     class="btn-nav dark" style="justify-content:flex-start; background:#e7f1ff; color:#007bff;"><i class="fas fa-flask"></i> Lab Results</a>
+            <a href="/settings"    class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-cog"></i> Settings</a>
+            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+            <a href="/logout"      class="btn-nav dark" style="justify-content:flex-start; color:#dc3545;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+
+        <a href="/dashboard" class="back-btn no-print">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </a>
+
+        <!-- Page title -->
+        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:22px;" class="no-print">
+            <div>
+                <h1 style="font-size:1.7rem; margin:0;">
+                    <i class="fas fa-file-medical" style="color:#222;"></i>
+                    My Laboratory Reports
+                </h1>
+                <p style="color:#666; margin:4px 0 0; font-size:0.9rem;">
+                    Official clinical test results — HMS Global Hospital
+                </p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <span id="results-count"
+                    style="background:#f0f0f0; color:#333; padding:8px 18px;
+                           border-radius:20px; font-weight:700; font-size:0.9rem;">
+                    0 Reports
+                </span>
+                <button onclick="window.print()" class="print-btn">
+                    <i class="fas fa-print"></i> Print All
+                </button>
+            </div>
+        </header>
+
+        <!-- Summary bar -->
+        <div class="summary-bar no-print" id="summary-bar" style="display:none;">
+            <div class="summary-card">
+                <p class="num" id="cnt-total" style="color:#111;">0</p>
+                <p class="lbl">Total Tests</p>
+            </div>
+            <div class="summary-card">
+                <p class="num" id="cnt-abnormal" style="color:#cc0000;">0</p>
+                <p class="lbl">Abnormal Results</p>
+            </div>
+            <div class="summary-card">
+                <p class="num" id="cnt-normal" style="color:#228b22;">0</p>
+                <p class="lbl">Normal Results</p>
+            </div>
+            <div class="summary-card">
+                <p class="num" id="cnt-visits" style="color:#00589b;">0</p>
+                <p class="lbl">Visit Dates</p>
+            </div>
+        </div>
+
+        <!-- Filter row -->
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;" class="no-print">
+            <button class="filter-chip active" onclick="applyFilter('ALL',this)">All Tests</button>
+            <button class="filter-chip" onclick="applyFilter('blood',this)">Blood</button>
+            <button class="filter-chip" onclick="applyFilter('urine',this)">Urine</button>
+            <button class="filter-chip" onclick="applyFilter('cholesterol',this)">Cholesterol</button>
+            <button class="filter-chip" onclick="applyFilter('covid',this)">COVID-19</button>
+            <button class="filter-chip" onclick="applyFilter('vitamin',this)">Vitamins</button>
+            <button class="filter-chip" onclick="applyFilter('kidney',this)">Kidney</button>
+            <button class="filter-chip" onclick="applyFilter('liver',this)">Liver</button>
+        </div>
+
+        <!-- Reports rendered here -->
+        <div id="results-list">
+            <div style="text-align:center; padding:60px; color:#666;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:#ccc; display:block; margin-bottom:12px;"></i>
+                Loading reports...
+            </div>
+        </div>
+
+    </div>
+
+    <div class="chat-btn no-print" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-window no-print" id="chatWindow">
+        <div class="chat-header">
+            <span>🏥 HMS AI Assistant</span>
+            <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="msg bot-msg">
+                Hello! I can help you understand your lab reports.
+                Try asking <b>"What does my blood sugar result mean?"</b>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Ask about your results...">
+            <button onclick="handleChat()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
+    <script>
+    let allResults   = [];
+    let patientName  = '';
+    let patientDOB   = '';
+    let patientNIC   = '';
+    let patientTel   = '';
+    let patientAddr  = '';
+    let patientPID   = '';
+
+    /* ── Reference ranges ── */
+    const REF = {
+        'Blood Sugar (Glucose)':      { range: '70 – 100 mg/dL (fasting)',   unit: 'mg/dL' },
+        'Hemoglobin':                 { range: '13.5 – 17.5 g/dL (men)',     unit: 'g/dL'  },
+        'CBC - Complete Blood Count': { range: 'WBC 4.5-11 | PLT 150-400',   unit: 'K/uL'  },
+        'Thyroid Function (TSH)':     { range: '0.4 – 4.0 mIU/L',            unit: 'mIU/L' },
+        'Cholesterol':                { range: '< 200 mg/dL',                 unit: 'mg/dL' },
+        'Blood Pressure Check':       { range: '< 120/80 mmHg',               unit: 'mmHg'  },
+        'Vitamin D':                  { range: '20 – 50 ng/mL',               unit: 'ng/mL' },
+        'Urinalysis':                 { range: 'No pathological findings',     unit: '—'     },
+        'Urine Culture':              { range: 'No growth expected',           unit: '—'     },
+        'COVID-19 PCR Test':          { range: 'Negative (not detected)',      unit: '—'     },
+        'Kidney Function (Creatinine)':{ range: '0.7 – 1.2 mg/dL',           unit: 'mg/dL' },
+        'Liver Function (ALT)':       { range: '7 – 56 U/L',                  unit: 'U/L'   },
+        'Iron Level':                 { range: '65 – 177 mcg/dL',             unit: 'mcg/dL'},
+    };
+
+    /* ── Parse actual value & unit from notes string ── */
+    function parseValueUnit(notes, testName) {
+        if (!notes) return { value: '—', unit: '' };
+        // Pattern: "Status — 147 mg/dL," or "Status — Negative"
+        const m = notes.match(/^[A-Za-z]+\s*[—\-]\s*([\d.\/]+)\s*([a-zA-Z%\/]+)/);
+        if (m) return { value: m[1], unit: m[2] };
+        // Qualitative result (Positive / Negative / No Growth / etc.)
+        const q = notes.match(/^[A-Za-z]+\s*[—\-]\s*([A-Za-z][A-Za-z\s()]+?)[\.,]/);
+        if (q) return { value: q[1].trim(), unit: '' };
+        // Fallback: use ref unit
+        const ref = REF[testName];
+        return { value: '—', unit: ref ? ref.unit : '' };
+    }
+
+    /* ── Determine status from notes ── */
+    function getStatus(notes) {
+        if (!notes) return 'PENDING';
+        const n = notes.toLowerCase();
+        if (n.startsWith('high'))     return 'HIGH';
+        if (n.startsWith('low'))      return 'LOW';
+        if (n.startsWith('positive')) return 'POSITIVE';
+        if (n.startsWith('negative')) return 'NEGATIVE';
+        if (n.startsWith('normal'))   return 'NORMAL';
+        return 'PENDING';
+    }
+
+    /* ── Strip the status prefix from notes to get the comment ── */
+    function getComment(notes) {
+        if (!notes) return '';
+        return notes.replace(/^[A-Za-z]+\s*[—\-]\s*[\d.\/]+\s*[a-zA-Z%\/]*\s*[,.]?\s*/,'')
+                    .replace(/^[A-Za-z]+\s*[—\-]\s*/,'').trim();
+    }
+
+    /* ── Build one report card covering a set of results (same visit date) ── */
+    function buildReportCard(dateKey, rows, reportIndex) {
+        const firstRow   = rows[0];
+        const reportNo   = `LAB-${dateKey.replace(/-/g,'')}-${String(reportIndex+1).padStart(2,'0')}`;
+        const doctor     = firstRow.docname || 'N/A';
+        const printDate  = new Date().toLocaleDateString('en-GB');
+
+        // Collect comments
+        const comments = rows
+            .map(r => { const c = getComment(r.notes); return c ? `${r.test_name}: ${c}` : ''; })
+            .filter(Boolean);
+
+        const tableRows = rows.map((r, i) => {
+            const status   = getStatus(r.notes);
+            const { value, unit } = parseValueUnit(r.notes, r.test_name);
+            const ref      = REF[r.test_name] || { range: '—', unit: unit };
+            const refRange = ref.range;
+
+            let flagHtml = '', normalVal = '', abnormalVal = '';
+
+            if (status === 'HIGH') {
+                flagHtml    = `<span class="flag-H">H</span>`;
+                abnormalVal = `<span class="val-abnormal">${value}</span>`;
+            } else if (status === 'LOW') {
+                flagHtml    = `<span class="flag-L">L</span>`;
+                abnormalVal = `<span class="val-abnormal">${value}</span>`;
+            } else if (status === 'POSITIVE') {
+                flagHtml    = `<span class="flag-A">A</span>`;
+                abnormalVal = `<span class="val-abnormal">${value}</span>`;
+            } else if (status === 'NEGATIVE' || status === 'NORMAL') {
+                normalVal   = `<span class="val-normal">${value}</span>`;
+            } else {
+                normalVal   = `<span style="color:#aaa;">Pending</span>`;
+            }
+
+            const unitDisplay = ref.unit !== '—' ? ref.unit : unit;
+            const created = r.created_at ? r.created_at.toString().slice(11,19) : '';
+
+            return `
+            <tr>
+                <td style="font-weight:600; padding-left:14px;">${r.test_name}</td>
+                <td style="text-align:center;">${normalVal}</td>
+                <td style="text-align:center;">${abnormalVal}</td>
+                <td style="text-align:center;">${flagHtml}</td>
+                <td style="text-align:center; color:#555; font-size:0.8rem;">${unitDisplay}</td>
+                <td style="color:#444; font-size:0.78rem;">${refRange}</td>
+            </tr>`;
+        }).join('');
+
+        const commentsHtml = comments.length ? `
+        <div class="rpt-comment">
+            <div class="comment-label">Physician / Lab Comments</div>
+            ${comments.map((c,i) => `<div style="margin-bottom:3px;"><b>${i+1}.</b> ${c}</div>`).join('')}
+        </div>` : '';
+
+        return `
+        <div class="report-card" id="report-${reportIndex}">
+
+            <!-- ① Header -->
+            <div class="rpt-header">
+                <div>
+                    <div class="lab-name">HMS GLOBAL HOSPITAL — DEPARTMENT OF LABORATORY MEDICINE</div>
+                    <div class="lab-addr">Ankara, Turkey &nbsp;|&nbsp; Tel: +90 800 HMS 0000 &nbsp;|&nbsp; lab@hmsglobal.com</div>
+                </div>
+                <div class="rpt-meta">
+                    <strong>Report No: ${reportNo}</strong>
+                    <div>Date Printed: ${printDate}</div>
+                    <div>Authorized: Dr. ${doctor}</div>
+                </div>
+            </div>
+
+            <!-- ② Title -->
+            <div class="rpt-title">Laboratory Report — ${dateKey}</div>
+
+            <!-- ③ Patient Demographics -->
+            <div class="rpt-info-grid">
+                <div class="rpt-info-cell">
+                    <label>Patient Name</label>
+                    <span>${patientName}</span>
+                </div>
+                <div class="rpt-info-cell">
+                    <label>Date of Birth</label>
+                    <span>${patientDOB}</span>
+                </div>
+                <div class="rpt-info-cell">
+                    <label>NIC / Patient ID</label>
+                    <span>${patientNIC} &nbsp;|&nbsp; ${patientPID}</span>
+                </div>
+            </div>
+            <div class="rpt-info-grid">
+                <div class="rpt-info-cell">
+                    <label>Contact No.</label>
+                    <span>${patientTel}</span>
+                </div>
+                <div class="rpt-info-cell">
+                    <label>Address</label>
+                    <span>${patientAddr}</span>
+                </div>
+                <div class="rpt-info-cell">
+                    <label>Ordering Physician</label>
+                    <span>Dr. ${doctor}</span>
+                </div>
+            </div>
+
+            <!-- ④ Collection info -->
+            <div class="rpt-collect">
+                <div>
+                    <label>Collection Date</label>
+                    ${dateKey}
+                </div>
+                <div>
+                    <label>Received Date</label>
+                    ${dateKey}
+                </div>
+                <div>
+                    <label>Report Date / Time</label>
+                    ${dateKey} &nbsp; ${firstRow.created_at ? firstRow.created_at.toString().slice(11,16) : ''}
+                </div>
+                <div>
+                    <label>No. of Tests</label>
+                    ${rows.length}
+                </div>
+            </div>
+
+            <!-- ⑤ Results Table -->
+            <table class="rpt-table">
+                <thead>
+                    <tr>
+                        <th style="width:32%;">Test</th>
+                        <th style="width:12%; text-align:center;">Normal</th>
+                        <th style="width:12%; text-align:center;">Abnormal</th>
+                        <th style="width:8%;  text-align:center;">Flag</th>
+                        <th style="width:10%; text-align:center;">Units</th>
+                        <th style="width:26%;">Reference Range</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="section-hdr">
+                        <td colspan="6">TEST RESULTS</td>
+                    </tr>
+                    ${tableRows}
+                </tbody>
+            </table>
+
+            <!-- ⑥ Comments -->
+            ${commentsHtml}
+
+            <!-- ⑦ Flag key -->
+            <div class="rpt-flag-key">
+                <span><b>Flag Key:</b></span>
+                <span><span class="flag-L">L</span> = Abnormal Low</span>
+                <span><span class="flag-H">H</span> = Abnormal High</span>
+                <span><span class="flag-A">A</span> = Abnormal / Positive</span>
+                <span style="margin-left:auto; font-style:italic;">Results are interpreted in relation to the reference ranges supplied by HMS Laboratory.</span>
+            </div>
+
+            <!-- ⑧ Footer signature -->
+            <div class="rpt-footer">
+                <div class="rpt-sig">
+                    Verified &amp; Authorized by:
+                    <strong>Dr. ${doctor} &mdash; HMS Global Laboratory Services</strong>
+                </div>
+                <button onclick="window.print()" class="print-btn no-print">
+                    <i class="fas fa-print"></i> Print Report
+                </button>
+            </div>
+
+            <!-- ⑨ End marker -->
+
+        </div>`;
+    }
+
+    /* ── Group results by date and render ── */
+    function renderResults(results) {
+        const list = document.getElementById('results-list');
+
+        if (!results || results.length === 0) {
+            list.innerHTML = `
+                <div style="text-align:center; padding:70px; color:#666;">
+                    <i class="fas fa-file-medical" style="font-size:3rem; color:#ccc; display:block; margin-bottom:14px;"></i>
+                    <p style="font-size:1.1rem;">No lab reports found.</p>
+                    <p style="font-size:0.85rem; color:#aaa;">Your doctor will add results after your tests.</p>
+                </div>`;
+            return;
+        }
+
+        // Group by date
+        const groups = {};
+        results.forEach(r => {
+            const d = r.created_at ? r.created_at.toString().slice(0, 10) : 'Unknown';
+            if (!groups[d]) groups[d] = [];
+            groups[d].push(r);
+        });
+
+        // Sort dates descending
+        const sorted = Object.keys(groups).sort((a,b) => b.localeCompare(a));
+
+        list.innerHTML = sorted.map((date, i) =>
+            buildReportCard(date, groups[date], i)
+        ).join('');
+    }
+
+    /* ── Filter ── */
+    function applyFilter(keyword, btn) {
+        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        if (keyword === 'ALL') { renderResults(allResults); return; }
+        renderResults(allResults.filter(r =>
+            r.test_name.toLowerCase().includes(keyword.toLowerCase())
+        ));
+    }
+
+    /* ── Load data ── */
+    async function loadResults() {
+        try {
+            const [meRes, profRes, resRes] = await Promise.all([
+                fetch('/api/me'),
+                fetch('/api/patient/profile'),
+                fetch('/api/results')
+            ]);
+
+            const me   = await meRes.json();
+            const prof = profRes.ok ? await profRes.json() : {};
+            allResults = await resRes.json();
+            if (!Array.isArray(allResults)) allResults = [];
+
+            patientName = me.name  || '—';
+            patientDOB  = prof.pdob     ? prof.pdob.toString().slice(0,10)     : '—';
+            patientNIC  = prof.pnic     || '—';
+            patientTel  = prof.ptel     || '—';
+            patientAddr = prof.paddress || '—';
+            patientPID  = prof.pid      ? `HMS-P-${String(prof.pid).padStart(5,'0')}` : '—';
+
+            // Summary counts
+            const abnormal = allResults.filter(r => {
+                const s = getStatus(r.notes);
+                return s === 'HIGH' || s === 'LOW' || s === 'POSITIVE';
+            }).length;
+            const normal = allResults.filter(r => {
+                const s = getStatus(r.notes);
+                return s === 'NORMAL' || s === 'NEGATIVE';
+            }).length;
+            const visits = new Set(
+                allResults.map(r => r.created_at ? r.created_at.toString().slice(0,10) : '')
+            ).size;
+
+            document.getElementById('cnt-total').innerText    = allResults.length;
+            document.getElementById('cnt-abnormal').innerText = abnormal;
+            document.getElementById('cnt-normal').innerText   = normal;
+            document.getElementById('cnt-visits').innerText   = visits;
+            document.getElementById('results-count').innerText = allResults.length + ' Reports';
+
+            if (allResults.length > 0) {
+                document.getElementById('summary-bar').style.display = 'flex';
+            }
+
+            renderResults(allResults);
+
+        } catch(e) {
+            document.getElementById('results-list').innerHTML = `
+                <div style="text-align:center; padding:60px; color:#cc0000;">
+                    Error loading reports: ${e.message}
+                </div>`;
+        }
+    }
+
+    loadResults();
+    </script>
+</body>
+</html>
