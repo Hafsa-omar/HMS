@@ -353,8 +353,7 @@ function setType(t, btn) {
     selectedType = t;
     document.querySelectorAll('#type-pills .pill-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    // Re-filter existing doctors
-    renderDoctorCards(selectedType ? allDoctors.filter(d => d.hospital_type === selectedType) : allDoctors);
+    loadDoctors();
     updateSummary();
 }
 
@@ -379,14 +378,28 @@ async function loadDoctors() {
         const params = new URLSearchParams();
         if (selectedCountry) params.set('country', selectedCountry);
         if (selectedCity)    params.set('city', selectedCity);
+        if (selectedType)    params.set('type', selectedType);
         if (params.toString()) url += '?' + params.toString();
 
         const res = await fetch(url);
         allDoctors = await res.json();
         if (!Array.isArray(allDoctors)) allDoctors = [];
 
-        const filtered = selectedType ? allDoctors.filter(d => d.hospital_type === selectedType) : allDoctors;
-        renderDoctorCards(filtered);
+        if (!allDoctors.length && (selectedCountry || selectedCity || selectedType)) {
+            // No results with filters — fallback to all locations for this specialty
+            const fallback = await fetch(`/api/doctors/specialty/${specId}`);
+            const fallbackDocs = await fallback.json();
+            if (Array.isArray(fallbackDocs) && fallbackDocs.length) {
+                allDoctors = fallbackDocs;
+                cardsDiv.innerHTML = `<p style="color:#e67e22;text-align:center;padding:10px 20px;font-size:0.82rem;">
+                    ⚠️ No doctors match your current filters in this location.<br>
+                    Showing all available doctors for this specialty worldwide.
+                </p>`;
+                renderDoctorCards(allDoctors);
+                return;
+            }
+        }
+        renderDoctorCards(allDoctors);
     } catch(e) {
         cardsDiv.innerHTML = '<p style="color:red;text-align:center;padding:20px;">Error loading doctors. Please restart the server.</p>';
     }

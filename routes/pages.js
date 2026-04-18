@@ -37,5 +37,11 @@ module.exports = (requireLogin) => {
     // Admin page
     router.get('/admin', requireLogin, (req, res) => res.sendFile(P('admin.html')));
 
+    // Logout
+    router.get('/logout', (req, res) => {
+        req.session.destroy();
+        res.redirect('/');
+    });
+
     return router;
 };
