@@ -120,6 +120,17 @@
                             <button class="pill-btn" onclick="setCountry('Germany',this)">🇩🇪 Germany</button>
                             <button class="pill-btn" onclick="setCountry('USA',this)">🇺🇸 USA</button>
                             <button class="pill-btn" onclick="setCountry('France',this)">🇫🇷 France</button>
+                            <button class="pill-btn" onclick="setCountry('Saudi Arabia',this)">🇸🇦 Saudi Arabia</button>
+                            <button class="pill-btn" onclick="setCountry('India',this)">🇮🇳 India</button>
+                            <button class="pill-btn" onclick="setCountry('Pakistan',this)">🇵🇰 Pakistan</button>
+                            <button class="pill-btn" onclick="setCountry('Egypt',this)">🇪🇬 Egypt</button>
+                            <button class="pill-btn" onclick="setCountry('Nigeria',this)">🇳🇬 Nigeria</button>
+                            <button class="pill-btn" onclick="setCountry('Malaysia',this)">🇲🇾 Malaysia</button>
+                            <button class="pill-btn" onclick="setCountry('Japan',this)">🇯🇵 Japan</button>
+                            <button class="pill-btn" onclick="setCountry('South Korea',this)">🇰🇷 South Korea</button>
+                            <button class="pill-btn" onclick="setCountry('Australia',this)">🇦🇺 Australia</button>
+                            <button class="pill-btn" onclick="setCountry('Canada',this)">🇨🇦 Canada</button>
+                            <button class="pill-btn" onclick="setCountry('Mexico',this)">🇲🇽 Mexico</button>
                         </div>
                     </div>
                     <div>
@@ -292,15 +303,30 @@
 
 <script src="/js/chatbot.js"></script>
 <script>
-const countryFlags = { Turkey:'🇹🇷', UAE:'🇦🇪', UK:'🇬🇧', Germany:'🇩🇪', USA:'🇺🇸', France:'🇫🇷' };
+const countryFlags = {
+    Turkey:'🇹🇷', UAE:'🇦🇪', UK:'🇬🇧', Germany:'🇩🇪', USA:'🇺🇸', France:'🇫🇷',
+    'Saudi Arabia':'🇸🇦', India:'🇮🇳', Pakistan:'🇵🇰', Egypt:'🇪🇬', Nigeria:'🇳🇬',
+    Malaysia:'🇲🇾', Japan:'🇯🇵', 'South Korea':'🇰🇷', Australia:'🇦🇺', Canada:'🇨🇦', Mexico:'🇲🇽'
+};
 const citiesByCountry = {
-    '':       ['All Cities'],
-    Turkey:   ['All Cities','Ankara','Istanbul'],
-    UAE:      ['All Cities','Dubai','Abu Dhabi'],
-    UK:       ['All Cities','London'],
-    Germany:  ['All Cities','Berlin'],
-    USA:      ['All Cities','New York'],
-    France:   ['All Cities','Paris']
+    '':             ['All Cities'],
+    Turkey:         ['All Cities','Ankara','Istanbul','Izmir'],
+    UAE:            ['All Cities','Dubai','Abu Dhabi'],
+    UK:             ['All Cities','London','Manchester','Birmingham'],
+    Germany:        ['All Cities','Berlin','Munich','Hamburg'],
+    USA:            ['All Cities','New York','Houston','Chicago'],
+    France:         ['All Cities','Paris'],
+    'Saudi Arabia': ['All Cities','Riyadh'],
+    India:          ['All Cities','Mumbai','Delhi'],
+    Pakistan:       ['All Cities','Karachi','Lahore'],
+    Egypt:          ['All Cities','Cairo'],
+    Nigeria:        ['All Cities','Lagos'],
+    Malaysia:       ['All Cities','Kuala Lumpur'],
+    Japan:          ['All Cities','Tokyo'],
+    'South Korea':  ['All Cities','Seoul'],
+    Australia:      ['All Cities','Sydney','Melbourne'],
+    Canada:         ['All Cities','Toronto','Vancouver'],
+    Mexico:         ['All Cities','Mexico City']
 };
 const avatarColors = ['#007bff','#e74c3c','#27ae60','#8e44ad','#e67e22','#16a085','#c0392b','#2980b9'];
 
