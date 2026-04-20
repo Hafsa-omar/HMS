@@ -116,10 +116,11 @@ async function init() {
 
     // Load record
     const url = viewPid ? `/api/health-record?pid=${viewPid}` : '/api/health-record';
-    const res  = await fetch(url);
+    const [res, hiRes] = await Promise.all([fetch(url), fetch('/api/health-info')]);
     const data = await res.json();
+    const healthInfo = await hiRes.json().catch(() => ({}));
     if (data.error) { document.getElementById('record-container').innerHTML = `<p style="color:red">${data.error}</p>`; return; }
-    renderRecord(data, me);
+    renderRecord(data, me, healthInfo);
 }
 
 function buildSidebar(usertype) {
@@ -375,7 +376,7 @@ function buildTimeline(appointments, labResults, profile) {
     }).join('');
 }
 
-function renderRecord(data, me) {
+function renderRecord(data, me, hi) {
     const { profile, appointments, labResults } = data;
     if (!profile) { document.getElementById('record-container').innerHTML = '<p style="color:red">Patient not found.</p>'; return; }
 
@@ -426,6 +427,22 @@ function renderRecord(data, me) {
                 <div class="info-cell"><label>Last Visit</label><span>${lastVisit}</span></div>
             </div>
         </div>
+
+        <!-- Patient Self-Reported Health Info -->
+        ${(hi && (hi.blood_type || hi.allergies || hi.chronic_conditions || hi.current_medications || hi.emergency_contact_name)) ? `
+        <div class="hr-card">
+            <div class="section-title"><i class="fas fa-heartbeat" style="color:#e91e63;"></i> Patient Health Information</div>
+            <div class="info-grid">
+                <div class="info-cell"><label>Blood Type</label><span>${hi.blood_type || '—'}</span></div>
+                <div class="info-cell"><label>Emergency Contact</label><span>${hi.emergency_contact_name || '—'}</span></div>
+                <div class="info-cell"><label>Emergency Phone</label><span>${hi.emergency_contact_phone || '—'}</span></div>
+                <div class="info-cell"><label>Last Updated</label><span>${hi.updated_at ? hi.updated_at.toString().slice(0,10) : '—'}</span></div>
+            </div>
+            ${hi.allergies ? `<div style="margin-top:12px;"><label style="font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;">Allergies</label><p style="margin:4px 0 0;color:#c0392b;font-weight:600;">${hi.allergies}</p></div>` : ''}
+            ${hi.chronic_conditions ? `<div style="margin-top:12px;"><label style="font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;">Chronic Conditions</label><p style="margin:4px 0 0;color:#333;">${hi.chronic_conditions}</p></div>` : ''}
+            ${hi.current_medications ? `<div style="margin-top:12px;"><label style="font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;">Current Medications</label><p style="margin:4px 0 0;color:#333;">${hi.current_medications}</p></div>` : ''}
+            ${hi.notes ? `<div style="margin-top:12px;"><label style="font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;">Notes</label><p style="margin:4px 0 0;color:#555;font-style:italic;">${hi.notes}</p></div>` : ''}
+        </div>` : ''}
 
         <!-- Summary Stats -->
         <div class="hr-card">

@@ -236,5 +236,40 @@ module.exports = (db, requireLogin) => {
         );
     });
 
+    router.get('/health-info', requireLogin, (req, res) => {
+        db.query('SELECT * FROM patient_health_info WHERE pid = ?',
+            [req.session.user.pid], (err, rows) => {
+                if (err) return res.status(500).json({ error: err.message });
+                res.json(rows[0] || {});
+            }
+        );
+    });
+
+    router.post('/health-info', requireLogin, (req, res) => {
+        const pid = req.session.user.pid;
+        const { blood_type, allergies, chronic_conditions, current_medications,
+                emergency_contact_name, emergency_contact_phone, notes } = req.body;
+        db.query(
+            `INSERT INTO patient_health_info
+                (pid, blood_type, allergies, chronic_conditions, current_medications,
+                 emergency_contact_name, emergency_contact_phone, notes)
+             VALUES (?,?,?,?,?,?,?,?)
+             ON DUPLICATE KEY UPDATE
+                blood_type=VALUES(blood_type),
+                allergies=VALUES(allergies),
+                chronic_conditions=VALUES(chronic_conditions),
+                current_medications=VALUES(current_medications),
+                emergency_contact_name=VALUES(emergency_contact_name),
+                emergency_contact_phone=VALUES(emergency_contact_phone),
+                notes=VALUES(notes)`,
+            [pid, blood_type, allergies, chronic_conditions, current_medications,
+             emergency_contact_name, emergency_contact_phone, notes],
+            (err) => {
+                if (err) return res.status(500).json({ error: err.message });
+                res.json({ success: true });
+            }
+        );
+    });
+
     return router;
 };

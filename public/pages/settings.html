@@ -236,6 +236,19 @@
             <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
         </div>
 
+        <div onclick="openHealthModal()" class="settings-card">
+            <div class="settings-icon" style="background:#fce4ec; color:#e91e63;">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div>
+                <h3 style="margin:0; font-size:1rem;">My Health Information</h3>
+                <p style="margin:3px 0 0; color:#666; font-size:0.85rem;">
+                    Add your blood type, allergies, conditions & medications
+                </p>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
+        </div>
+
         <div onclick="toggleChat()" class="settings-card">
             <div class="settings-icon" style="background:#e7f1ff; color:#007bff;">
                 <i class="fas fa-robot"></i>
@@ -306,6 +319,64 @@
                        font-weight:600; margin-top:20px;">
                 Close
             </button>
+        </div>
+    </div>
+
+    <!-- HEALTH INFO MODAL -->
+    <div class="modal-bg" id="healthModal">
+        <div class="modal-box" style="max-width:520px; max-height:90vh; overflow-y:auto;">
+            <h3 style="margin:0 0 5px; color:#e91e63;">
+                <i class="fas fa-heartbeat"></i> My Health Information
+            </h3>
+            <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">
+                This information is saved to your health record and shared with doctors you choose.
+            </p>
+            <div id="health-msg"></div>
+
+            <label style="font-size:0.82rem; font-weight:700; color:#555;">BLOOD TYPE</label>
+            <select id="h-blood" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin:5px 0 14px; font-size:0.9rem;">
+                <option value="">-- Select --</option>
+                <option>A+</option><option>A-</option>
+                <option>B+</option><option>B-</option>
+                <option>AB+</option><option>AB-</option>
+                <option>O+</option><option>O-</option>
+                <option>Unknown</option>
+            </select>
+
+            <label style="font-size:0.82rem; font-weight:700; color:#555;">ALLERGIES</label>
+            <textarea id="h-allergies" rows="2" placeholder="e.g. Penicillin, peanuts, latex..."
+                style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin:5px 0 14px; font-size:0.9rem; resize:vertical; box-sizing:border-box;"></textarea>
+
+            <label style="font-size:0.82rem; font-weight:700; color:#555;">CHRONIC CONDITIONS</label>
+            <textarea id="h-conditions" rows="2" placeholder="e.g. Diabetes type 2, hypertension, asthma..."
+                style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin:5px 0 14px; font-size:0.9rem; resize:vertical; box-sizing:border-box;"></textarea>
+
+            <label style="font-size:0.82rem; font-weight:700; color:#555;">CURRENT MEDICATIONS</label>
+            <textarea id="h-medications" rows="2" placeholder="e.g. Metformin 500mg, Lisinopril 10mg..."
+                style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin:5px 0 14px; font-size:0.9rem; resize:vertical; box-sizing:border-box;"></textarea>
+
+            <label style="font-size:0.82rem; font-weight:700; color:#555;">EMERGENCY CONTACT NAME</label>
+            <input id="h-ec-name" type="text" placeholder="Full name"
+                style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin:5px 0 14px; font-size:0.9rem; box-sizing:border-box;">
+
+            <label style="font-size:0.82rem; font-weight:700; color:#555;">EMERGENCY CONTACT PHONE</label>
+            <input id="h-ec-phone" type="text" placeholder="+1 555 000 0000"
+                style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin:5px 0 14px; font-size:0.9rem; box-sizing:border-box;">
+
+            <label style="font-size:0.82rem; font-weight:700; color:#555;">ADDITIONAL NOTES</label>
+            <textarea id="h-notes" rows="2" placeholder="Any other health information your doctor should know..."
+                style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin:5px 0 20px; font-size:0.9rem; resize:vertical; box-sizing:border-box;"></textarea>
+
+            <div style="display:flex; gap:10px;">
+                <button onclick="saveHealthInfo()"
+                    style="flex:1; padding:12px; background:#e91e63; color:white; border:none; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.95rem;">
+                    Save Health Info
+                </button>
+                <button onclick="document.getElementById('healthModal').classList.remove('active')"
+                    style="padding:12px 20px; background:#f5f5f5; border:none; border-radius:10px; cursor:pointer; font-weight:600;">
+                    Cancel
+                </button>
+            </div>
         </div>
     </div>
 
@@ -425,6 +496,50 @@
 
         function openDeleteModal() {
             document.getElementById('deleteModal').classList.add('active');
+        }
+
+        async function openHealthModal() {
+            document.getElementById('healthModal').classList.add('active');
+            try {
+                const res = await fetch('/api/health-info');
+                const d = await res.json();
+                document.getElementById('h-blood').value        = d.blood_type              || '';
+                document.getElementById('h-allergies').value    = d.allergies               || '';
+                document.getElementById('h-conditions').value   = d.chronic_conditions      || '';
+                document.getElementById('h-medications').value  = d.current_medications     || '';
+                document.getElementById('h-ec-name').value      = d.emergency_contact_name  || '';
+                document.getElementById('h-ec-phone').value     = d.emergency_contact_phone || '';
+                document.getElementById('h-notes').value        = d.notes                   || '';
+            } catch(e) {}
+        }
+
+        async function saveHealthInfo() {
+            const body = {
+                blood_type:              document.getElementById('h-blood').value,
+                allergies:               document.getElementById('h-allergies').value,
+                chronic_conditions:      document.getElementById('h-conditions').value,
+                current_medications:     document.getElementById('h-medications').value,
+                emergency_contact_name:  document.getElementById('h-ec-name').value,
+                emergency_contact_phone: document.getElementById('h-ec-phone').value,
+                notes:                   document.getElementById('h-notes').value
+            };
+            try {
+                const res  = await fetch('/api/health-info', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                const msg  = document.getElementById('health-msg');
+                if (data.success) {
+                    msg.innerHTML = '<p style="color:#27ae60; font-size:0.88rem; margin-bottom:12px;">✅ Health information saved successfully!</p>';
+                    setTimeout(() => document.getElementById('healthModal').classList.remove('active'), 1500);
+                } else {
+                    msg.innerHTML = '<p style="color:#dc3545; font-size:0.88rem;">❌ Error saving. Please try again.</p>';
+                }
+            } catch(e) {
+                document.getElementById('health-msg').innerHTML = '<p style="color:#dc3545; font-size:0.88rem;">❌ Server error.</p>';
+            }
         }
 
         function closeAll() {
