@@ -1,6 +1,26 @@
 const express = require('express');
 const bcrypt  = require('bcrypt');
+const multer  = require('multer');
+const path    = require('path');
+const fs      = require('fs');
 const router  = express.Router();
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
+    filename:    (req, file, cb) => {
+        const unique = Date.now() + '-' + Math.round(Math.random() * 1e6);
+        cb(null, unique + path.extname(file.originalname));
+    }
+});
+const upload = multer({
+    storage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
+    fileFilter: (req, file, cb) => {
+        const allowed = ['.pdf', '.jpg', '.jpeg', '.png'];
+        if (allowed.includes(path.extname(file.originalname).toLowerCase())) cb(null, true);
+        else cb(new Error('Only PDF, JPG, and PNG files are allowed'));
+    }
+});
 
 module.exports = (db, requireLogin) => {
 
@@ -232,6 +252,62 @@ module.exports = (db, requireLogin) => {
             [req.session.user.pid], (err, results) => {
                 if (err) return res.status(500).json({ error: err.message });
                 res.json(results);
+            }
+        );
+    });
+
+    // Upload a document
+    router.post('/documents/upload', requireLogin, (req, res) => {
+        upload.single('document')(req, res, (err) => {
+            if (err) return res.status(400).json({ error: err.message });
+            if (!req.file) return res.status(400).json({ error: 'No file received' });
+            const pid = req.session.user.pid;
+            db.query(
+                'INSERT INTO patient_documents (pid, original_name, stored_name, file_type, file_size) VALUES (?,?,?,?,?)',
+                [pid, req.file.originalname, req.file.filename,
+                 req.file.mimetype, req.file.size],
+                (err, result) => {
+                    if (err) return res.status(500).json({ error: err.message });
+                    res.json({ success: true, id: result.insertId, name: req.file.originalname });
+                }
+            );
+        });
+    });
+
+    // List all documents for the logged-in patient
+    router.get('/documents', requireLogin, (req, res) => {
+        db.query(
+            'SELECT id, original_name, file_type, file_size, uploaded_at FROM patient_documents WHERE pid = ? ORDER BY uploaded_at DESC',
+            [req.session.user.pid], (err, rows) => {
+                if (err) return res.status(500).json({ error: err.message });
+                res.json(rows);
+            }
+        );
+    });
+
+    // Download / view a document
+    router.get('/documents/:id', requireLogin, (req, res) => {
+        db.query(
+            'SELECT * FROM patient_documents WHERE id = ? AND pid = ?',
+            [req.params.id, req.session.user.pid], (err, rows) => {
+                if (err || !rows.length) return res.status(404).json({ error: 'File not found' });
+                const filePath = path.join(__dirname, '..', 'uploads', rows[0].stored_name);
+                res.setHeader('Content-Disposition', `inline; filename="${rows[0].original_name}"`);
+                res.sendFile(filePath);
+            }
+        );
+    });
+
+    // Delete a document
+    router.post('/documents/delete/:id', requireLogin, (req, res) => {
+        db.query(
+            'SELECT * FROM patient_documents WHERE id = ? AND pid = ?',
+            [req.params.id, req.session.user.pid], (err, rows) => {
+                if (err || !rows.length) return res.status(404).json({ error: 'Not found' });
+                const filePath = path.join(__dirname, '..', 'uploads', rows[0].stored_name);
+                db.query('DELETE FROM patient_documents WHERE id = ?', [req.params.id], () => {
+                    fs.unlink(filePath, () => res.json({ success: true }));
+                });
             }
         );
     });

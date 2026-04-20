@@ -236,6 +236,19 @@
             <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
         </div>
 
+        <div onclick="openDocsModal()" class="settings-card">
+            <div class="settings-icon" style="background:#e8f4fd; color:#1565c0;">
+                <i class="fas fa-file-upload"></i>
+            </div>
+            <div>
+                <h3 style="margin:0; font-size:1rem;">Upload Medical Documents</h3>
+                <p style="margin:3px 0 0; color:#666; font-size:0.85rem;">
+                    Upload PDF or image copies of your health records
+                </p>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto; color:#ccc;"></i>
+        </div>
+
         <div onclick="openHealthModal()" class="settings-card">
             <div class="settings-icon" style="background:#fce4ec; color:#e91e63;">
                 <i class="fas fa-heartbeat"></i>
@@ -317,6 +330,39 @@
                 style="width:100%; padding:13px; background:#007bff; color:white;
                        border:none; border-radius:8px; cursor:pointer;
                        font-weight:600; margin-top:20px;">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- DOCUMENTS MODAL -->
+    <div class="modal-bg" id="docsModal">
+        <div class="modal-box" style="max-width:540px; max-height:90vh; overflow-y:auto;">
+            <h3 style="margin:0 0 5px; color:#1565c0;">
+                <i class="fas fa-file-medical"></i> My Medical Documents
+            </h3>
+            <p style="color:#888; font-size:0.85rem; margin-bottom:18px;">
+                Upload PDF files or scanned images of your existing health records, lab reports, prescriptions, or X-rays.
+            </p>
+
+            <!-- Upload Area -->
+            <div id="upload-area" onclick="document.getElementById('doc-file-input').click()"
+                style="border:2px dashed #90caf9; border-radius:12px; padding:30px; text-align:center;
+                       cursor:pointer; background:#f0f8ff; margin-bottom:18px; transition:0.2s;"
+                onmouseover="this.style.background='#dbeeff'" onmouseout="this.style.background='#f0f8ff'">
+                <div style="font-size:2.5rem; color:#1565c0; margin-bottom:8px;"><i class="fas fa-cloud-upload-alt"></i></div>
+                <p style="margin:0; font-weight:700; color:#1565c0;">Click to select a file</p>
+                <p style="margin:4px 0 0; font-size:0.8rem; color:#888;">PDF, JPG, PNG — max 10 MB</p>
+            </div>
+            <input type="file" id="doc-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="uploadDocument(this)">
+            <div id="upload-msg" style="margin-bottom:12px;"></div>
+
+            <!-- File List -->
+            <div id="doc-list"></div>
+
+            <button onclick="document.getElementById('docsModal').classList.remove('active')"
+                style="width:100%; padding:11px; background:#f5f5f5; border:none; border-radius:10px;
+                       cursor:pointer; font-weight:600; margin-top:10px;">
                 Close
             </button>
         </div>
@@ -496,6 +542,78 @@
 
         function openDeleteModal() {
             document.getElementById('deleteModal').classList.add('active');
+        }
+
+        async function openDocsModal() {
+            document.getElementById('docsModal').classList.add('active');
+            loadDocList();
+        }
+
+        async function loadDocList() {
+            const list = document.getElementById('doc-list');
+            list.innerHTML = '<p style="color:#aaa; font-size:0.85rem; text-align:center;">Loading...</p>';
+            try {
+                const res  = await fetch('/api/documents');
+                const docs = await res.json();
+                if (!docs.length) {
+                    list.innerHTML = '<p style="color:#aaa; font-size:0.85rem; text-align:center;">No documents uploaded yet.</p>';
+                    return;
+                }
+                list.innerHTML = docs.map(d => {
+                    const icon = d.file_type === 'application/pdf' ? 'fa-file-pdf' : 'fa-file-image';
+                    const color = d.file_type === 'application/pdf' ? '#e53935' : '#43a047';
+                    const size  = (d.file_size / 1024).toFixed(0) + ' KB';
+                    const date  = d.uploaded_at ? d.uploaded_at.toString().slice(0,10) : '';
+                    return `<div style="display:flex; align-items:center; gap:12px; padding:12px;
+                                        background:#f9f9f9; border-radius:10px; margin-bottom:8px;">
+                        <i class="fas ${icon}" style="font-size:1.6rem; color:${color}; flex-shrink:0;"></i>
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-weight:700; font-size:0.88rem; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.original_name}</div>
+                            <div style="font-size:0.75rem; color:#999;">${size} &nbsp;·&nbsp; Uploaded ${date}</div>
+                        </div>
+                        <a href="/api/documents/${d.id}" target="_blank"
+                           style="padding:6px 12px; background:#1565c0; color:white; border-radius:7px;
+                                  text-decoration:none; font-size:0.78rem; font-weight:700; flex-shrink:0;">
+                            View
+                        </a>
+                        <button onclick="deleteDoc(${d.id})"
+                            style="padding:6px 10px; background:#fde8e8; color:#dc3545; border:none;
+                                   border-radius:7px; cursor:pointer; font-size:0.78rem; flex-shrink:0;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                list.innerHTML = '<p style="color:red; font-size:0.85rem;">Error loading documents.</p>';
+            }
+        }
+
+        async function uploadDocument(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const msg = document.getElementById('upload-msg');
+            msg.innerHTML = '<p style="color:#1565c0; font-size:0.85rem;">Uploading...</p>';
+            const form = new FormData();
+            form.append('document', file);
+            try {
+                const res  = await fetch('/api/documents/upload', { method: 'POST', body: form });
+                const data = await res.json();
+                if (data.success) {
+                    msg.innerHTML = `<p style="color:#27ae60; font-size:0.85rem;">✅ "${data.name}" uploaded successfully!</p>`;
+                    input.value = '';
+                    loadDocList();
+                } else {
+                    msg.innerHTML = `<p style="color:red; font-size:0.85rem;">❌ ${data.error}</p>`;
+                }
+            } catch(e) {
+                msg.innerHTML = '<p style="color:red; font-size:0.85rem;">❌ Upload failed. Check server.</p>';
+            }
+        }
+
+        async function deleteDoc(id) {
+            if (!confirm('Delete this document?')) return;
+            await fetch(`/api/documents/delete/${id}`, { method: 'POST' });
+            loadDocList();
         }
 
         async function openHealthModal() {

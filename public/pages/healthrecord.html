@@ -116,11 +116,12 @@ async function init() {
 
     // Load record
     const url = viewPid ? `/api/health-record?pid=${viewPid}` : '/api/health-record';
-    const [res, hiRes] = await Promise.all([fetch(url), fetch('/api/health-info')]);
+    const [res, hiRes, docsRes] = await Promise.all([fetch(url), fetch('/api/health-info'), fetch('/api/documents')]);
     const data = await res.json();
     const healthInfo = await hiRes.json().catch(() => ({}));
+    const documents  = await docsRes.json().catch(() => []);
     if (data.error) { document.getElementById('record-container').innerHTML = `<p style="color:red">${data.error}</p>`; return; }
-    renderRecord(data, me, healthInfo);
+    renderRecord(data, me, healthInfo, documents);
 }
 
 function buildSidebar(usertype) {
@@ -376,7 +377,7 @@ function buildTimeline(appointments, labResults, profile) {
     }).join('');
 }
 
-function renderRecord(data, me, hi) {
+function renderRecord(data, me, hi, documents) {
     const { profile, appointments, labResults } = data;
     if (!profile) { document.getElementById('record-container').innerHTML = '<p style="color:red">Patient not found.</p>'; return; }
 
@@ -442,6 +443,33 @@ function renderRecord(data, me, hi) {
             ${hi.chronic_conditions ? `<div style="margin-top:12px;"><label style="font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;">Chronic Conditions</label><p style="margin:4px 0 0;color:#333;">${hi.chronic_conditions}</p></div>` : ''}
             ${hi.current_medications ? `<div style="margin-top:12px;"><label style="font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;">Current Medications</label><p style="margin:4px 0 0;color:#333;">${hi.current_medications}</p></div>` : ''}
             ${hi.notes ? `<div style="margin-top:12px;"><label style="font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;">Notes</label><p style="margin:4px 0 0;color:#555;font-style:italic;">${hi.notes}</p></div>` : ''}
+        </div>` : ''}
+
+        <!-- Uploaded Documents -->
+        ${documents && documents.length ? `
+        <div class="hr-card">
+            <div class="section-title"><i class="fas fa-file-medical" style="color:#6f42c1;"></i> Uploaded Medical Documents</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                ${documents.map(doc => {
+                    const icon = doc.file_type === 'application/pdf' ? 'fa-file-pdf' : 'fa-file-image';
+                    const color = doc.file_type === 'application/pdf' ? '#dc3545' : '#007bff';
+                    const kb = (doc.file_size / 1024).toFixed(0);
+                    const date = doc.uploaded_at ? doc.uploaded_at.toString().slice(0,10) : '—';
+                    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f8f9fa;border-radius:10px;border:1px solid #e9ecef;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <i class="fas ${icon}" style="font-size:1.5rem;color:${color};"></i>
+                            <div>
+                                <div style="font-weight:700;color:#222;font-size:0.9rem;">${doc.original_name}</div>
+                                <div style="font-size:0.75rem;color:#888;">Uploaded: ${date} &nbsp;|&nbsp; ${kb} KB</div>
+                            </div>
+                        </div>
+                        <a href="/api/documents/${doc.id}" target="_blank"
+                           style="background:#007bff;color:white;border:none;padding:7px 16px;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;text-decoration:none;">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                    </div>`;
+                }).join('')}
+            </div>
         </div>` : ''}
 
         <!-- Summary Stats -->
