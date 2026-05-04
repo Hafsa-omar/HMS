@@ -16,8 +16,9 @@ module.exports = (requireLogin) => {
         res.sendFile(P('index.html'));
     });
 
-    router.get('/login',    (req, res) => res.sendFile(P('login.html')));
-    router.get('/register', (req, res) => res.sendFile(P('register.html')));
+    router.get('/login',       (req, res) => res.sendFile(P('login.html')));
+    router.get('/doctorlogin', (req, res) => res.sendFile(P('doctorlogin.html')));
+    router.get('/register',    (req, res) => res.sendFile(P('register.html')));
 
     // Patient pages
     router.get('/dashboard',   requireLogin, (req, res) => res.sendFile(P('dashboard.html')));

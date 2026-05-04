@@ -26,7 +26,7 @@ const db = mysql.createConnection({
 });
 db.connect((err) => {
     if (err) { console.error('DB Error: ' + err.message); return; }
-    console.log('✅ Database connected!');
+    console.log('Database connected.');
 });
 
 // ── Auth guard ────────────────────────────────────────────────────────────────
@@ -45,4 +45,4 @@ app.use('/api/chat',  require('./routes/chatbot')(db, requireLogin));
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`\n🏥 HMS running at: http://localhost:${PORT}\n`));
+app.listen(PORT, () => console.log(`HMS running at: http://localhost:${PORT}`));

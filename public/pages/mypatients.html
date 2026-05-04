@@ -129,7 +129,7 @@
 
     <div class="sidebar">
         <div class="logo" style="margin-bottom:30px; text-align:center;">
-            <img src="/assets/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+            <img src="/assets/HMS logo.jpeg" alt="HMS" style="width:150px; max-width:100%;">
         </div>
         <nav style="display:flex; flex-direction:column; gap:15px;">
             <a href="/doctor" class="btn-nav dark" style="justify-content:flex-start;">
@@ -202,13 +202,13 @@
 
         <!-- Search -->
         <input type="text" class="search-input"
-               placeholder="🔍 Search patients by name or email..."
+               placeholder="Search patients by name or email..."
                oninput="searchPatients(this.value)">
 
         <!-- Patient List -->
         <div id="patients-list">
             <div style="text-align:center; padding:60px; color:#666;">
-                ⏳ Loading patients...
+                Loading patients...
             </div>
         </div>
     </div>
@@ -258,12 +258,12 @@
     <div class="chat-btn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
     <div class="chat-window" id="chatWindow">
         <div class="chat-header">
-            <span>🏥 HMS AI Assistant</span>
+            <span>HMS AI Assistant</span>
             <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
         </div>
         <div class="chat-body" id="chatBody">
             <div class="msg bot-msg">
-                👨‍⚕️ Hello Doctor! I can see all your patients. Try asking <b>"How many patients do I have?"</b> or <b>"Find patient John"</b>
+                Hello Doctor! I can see all your patients. Try asking <b>"How many patients do I have?"</b> or <b>"Find patient John"</b>
             </div>
         </div>
         <div class="chat-footer">
@@ -292,7 +292,7 @@
                 renderPatients(allPatients);
             } catch(e) {
                 document.getElementById('patients-list').innerHTML =
-                    '<p style="text-align:center; color:red; padding:40px;">❌ Error loading patients.</p>';
+                    '<p style="text-align:center; color:red; padding:40px;">Error loading patients.</p>';
             }
         }
 

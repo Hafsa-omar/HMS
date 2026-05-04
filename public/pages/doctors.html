@@ -190,7 +190,7 @@
 
     <div class="sidebar">
         <div class="logo" style="margin-bottom:30px; text-align:center;">
-            <img src="/assets/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+            <img src="/assets/HMS logo.jpeg" alt="HMS" style="width:150px; max-width:100%;">
         </div>
         <nav style="display: flex; flex-direction: column; gap: 15px;">
             <a href="/dashboard" class="btn-nav dark" style="justify-content: flex-start;">
@@ -240,7 +240,7 @@
 
         <!-- Search Bar -->
         <input type="text" class="search-bar" id="searchInput"
-               placeholder="🔍 Search by doctor name or specialty..."
+               placeholder="Search by doctor name or specialty..."
                oninput="filterDoctors()">
 
         <!-- Specialty Filter Buttons -->
@@ -253,7 +253,7 @@
         <!-- Doctors Grid -->
         <div class="doctors-grid" id="doctors-grid">
             <div style="text-align:center; padding:60px; grid-column:1/-1; color:#666;">
-                ⏳ Loading doctors...
+                Loading doctors...
             </div>
         </div>
     </div>
@@ -302,12 +302,12 @@
     <div class="chat-btn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
     <div class="chat-window" id="chatWindow">
         <div class="chat-header">
-            <span>🏥 HMS AI Assistant</span>
+            <span>HMS AI Assistant</span>
             <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
         </div>
         <div class="chat-body" id="chatBody">
             <div class="msg bot-msg">
-                👋 Hello! I can help you find the right doctor! Try asking <b>"Which doctor should I see for back pain?"</b> or <b>"Who is the best cardiologist?"</b>
+                Hello! I can help you find the right doctor! Try asking <b>"Which doctor should I see for back pain?"</b> or <b>"Who is the best cardiologist?"</b>
             </div>
         </div>
         <div class="chat-footer">
@@ -342,7 +342,7 @@
                 renderDoctors(allDoctors);
             } catch(e) {
                 document.getElementById('doctors-grid').innerHTML =
-                    '<p style="color:red; grid-column:1/-1; text-align:center; padding:40px;">❌ Error loading doctors.</p>';
+                    '<p style="color:red; grid-column:1/-1; text-align:center; padding:40px;">Error loading doctors.</p>';
             }
         }
 

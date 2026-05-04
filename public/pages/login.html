@@ -20,7 +20,7 @@
 
     <div class="auth-card">
 
-        <img src="/assets/logo.png" alt="HMS" style="width:180px; margin-bottom:10px;">
+        <img src="/assets/HMS logo.jpeg" alt="HMS" style="width:180px; margin-bottom:10px;">
         <h2 id="login-title">Welcome Back!</h2>
         <span class="subtitle" id="login-subtitle">Login with your details to continue</span>
 
@@ -41,22 +41,21 @@
             </button>
 
             <p style="margin-top: 25px; font-size: 0.9rem; color: #666;">
-                Don't have an account? 
+                Don't have an account?
                 <a href="/register" style="color: #007bff; text-decoration: none; font-weight: 600;">Sign Up</a>
             </p>
 
         </form>
 
-        <!-- Quick Login Helper for Demo -->
         <div style="margin-top:25px; padding:15px; background:#f8f9fa; border-radius:10px; text-align:left;">
             <p style="font-size:0.8rem; font-weight:700; color:#666; margin-bottom:10px;">
-                🧪 Demo Accounts:
+                Demo Accounts:
             </p>
             <p style="font-size:0.8rem; color:#888; margin:4px 0;">
-                👤 Patient: <b>demo@hms.com</b> / <b>123</b>
+                Patient: <b>demo@hms.com</b> / <b>hms123</b>
             </p>
             <p style="font-size:0.8rem; color:#888; margin:4px 0;">
-                👨‍⚕️ Doctor: <b>doctor1@hms.com</b> / <b>123</b>
+                Admin: <b>admin@hms.com</b> / <b>hms123</b>
             </p>
         </div>
 
@@ -88,12 +87,7 @@
             const role = params.get('role');
             const title = document.getElementById('login-title');
             const subtitle = document.getElementById('login-subtitle');
-
-            if (role === 'doctor') {
-                title.innerText = "Doctor Staff Login";
-                subtitle.innerText = "Access the clinical management portal";
-                document.querySelector('.auth-card').style.borderTop = "5px solid #007bff";
-            } else if (role === 'patient') {
+            if (role === 'patient') {
                 title.innerText = "Patient Vault Login";
                 subtitle.innerText = "Securely access your medical records";
                 document.querySelector('.auth-card').style.borderTop = "5px solid #28a745";

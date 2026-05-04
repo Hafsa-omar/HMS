@@ -74,7 +74,7 @@
 
 <div class="sidebar">
     <div class="logo" style="margin-bottom:30px; text-align:center;">
-            <img src="/assets/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+            <img src="/assets/HMS logo.jpeg" alt="HMS" style="width:150px; max-width:100%;">
         </div>
     <nav style="display:flex; flex-direction:column; gap:15px;">
         <a href="/dashboard" class="btn-nav dark" style="justify-content:flex-start;"><i class="fas fa-th-large"></i> Dashboard</a>
@@ -147,8 +147,8 @@
                 <div class="step-label" id="lbl-2"><span class="step-num">2</span> Hospital Type</div>
                 <div class="step-body">
                     <div class="pill-group" id="type-pills">
-                        <button class="pill-btn active" onclick="setType('',this)">🏥 All</button>
-                        <button class="pill-btn pub"  onclick="setType('public',this)">🏥 Public</button>
+                        <button class="pill-btn active" onclick="setType('',this)">All</button>
+                        <button class="pill-btn pub"  onclick="setType('public',this)">Public</button>
                         <button class="pill-btn priv" onclick="setType('private',this)">🏨 Private</button>
                     </div>
                     <div style="margin-top:12px; font-size:0.78rem; color:#888; line-height:1.7;">
@@ -173,8 +173,8 @@
                 <div class="step-label" id="lbl-4"><span class="step-num">4</span> Do You Have Insurance?</div>
                 <div class="step-body">
                     <div class="pill-group" id="ins-pills">
-                        <button class="pill-btn ins-no active" onclick="setInsurance(false,this)">❌ No Insurance</button>
-                        <button class="pill-btn ins-yes" onclick="setInsurance(true,this)">✅ Yes, I Have Insurance</button>
+                        <button class="pill-btn ins-no active" onclick="setInsurance(false,this)">No Insurance</button>
+                        <button class="pill-btn ins-yes" onclick="setInsurance(true,this)">Yes, I Have Insurance</button>
                     </div>
                     <div class="ins-level" id="ins-level-box">
                         <label><i class="fas fa-shield-alt" style="color:#27ae60;"></i> Insurance Coverage Level:</label>
@@ -274,9 +274,9 @@
             <div class="book-card">
                 <h3 style="font-size:0.88rem; margin-bottom:12px;"><i class="fas fa-lightbulb" style="color:#ffc107;"></i> Tips</h3>
                 <div style="font-size:0.82rem; color:#666; line-height:2;">
-                    <p>✅ Book at least 24 hrs in advance</p>
-                    <p>✅ Bring your medical records</p>
-                    <p>✅ Arrive 10 minutes early</p>
+                    <p>Book at least 24 hrs in advance</p>
+                    <p>Bring your medical records</p>
+                    <p>Arrive 10 minutes early</p>
                     <p>🛡️ Insurance reduces your cost</p>
                     <p>⭐ Higher rated = more experienced</p>
                     <p>📋 Share health file for better care</p>
@@ -289,11 +289,11 @@
 <div class="chat-btn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
 <div class="chat-window" id="chatWindow">
     <div class="chat-header">
-        <span>🏥 HMS AI Assistant</span>
+        <span>HMS AI Assistant</span>
         <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
     </div>
     <div class="chat-body" id="chatBody">
-        <div class="msg bot-msg">👋 Hi! I can help you choose the right doctor or specialty. What symptoms do you have?</div>
+        <div class="msg bot-msg">Hi! I can help you choose the right doctor or specialty. What symptoms do you have?</div>
     </div>
     <div class="chat-footer">
         <input type="text" id="chatInput" placeholder="Ask me anything...">
@@ -589,7 +589,7 @@ async function bookAppointment() {
     if (!docid) { alert('Please select a doctor in Step 5.'); return; }
     if (!date)  { alert('Please select a date in Step 6.'); return; }
 
-    resultDiv.innerHTML = '<p style="color:#666;">⏳ Booking your appointment...</p>';
+    resultDiv.innerHTML = '<p style="color:#666;">Booking your appointment...</p>';
     try {
         const res  = await fetch('/api/book', {
             method:'POST', headers:{'Content-Type':'application/json'},
@@ -603,10 +603,10 @@ async function bookAppointment() {
             const youPay   = (selectedDoc?.fee || 0) - discount;
             resultDiv.innerHTML = `
                 <div style="background:#e6f9ee;border:1px solid #28a745;padding:20px;border-radius:12px;color:#155724;">
-                    <p style="font-size:1.1rem;font-weight:800;margin-bottom:12px;">✅ Appointment Booked!</p>
-                    <p style="margin:5px 0;font-size:0.88rem;">👨‍⚕️ <b>${selectedDoc?.docname}</b></p>
+                    <p style="font-size:1.1rem;font-weight:800;margin-bottom:12px;">Appointment Booked!</p>
+                    <p style="margin:5px 0;font-size:0.88rem;"><b>${selectedDoc?.docname}</b></p>
                     <p style="margin:5px 0;font-size:0.88rem;">${flag} ${selectedDoc?.hospital}</p>
-                    <p style="margin:5px 0;font-size:0.88rem;">📅 <b>${date}</b></p>
+                    <p style="margin:5px 0;font-size:0.88rem;"><b>${date}</b></p>
                     <p style="margin:5px 0;font-size:0.88rem;">💰 You Pay: <b>${youPay === 0 ? 'FREE' : '$'+youPay}</b></p>
                     <p style="margin:5px 0;font-size:0.88rem;">🔖 Ref: <b>HMS-${String(data.appointmentId).padStart(4,'0')}</b></p>
                     <div style="display:flex;gap:10px;margin-top:15px;">
@@ -615,10 +615,10 @@ async function bookAppointment() {
                     </div>
                 </div>`;
         } else {
-            resultDiv.innerHTML = `<p style="color:red;">❌ Booking failed. Please try again.</p>`;
+            resultDiv.innerHTML = `<p style="color:red;">Booking failed. Please try again.</p>`;
         }
     } catch(e) {
-        resultDiv.innerHTML = `<p style="color:red;">❌ Server error. Is the server running?</p>`;
+        resultDiv.innerHTML = `<p style="color:red;">Server error. Is the server running?</p>`;
     }
 }
 </script>

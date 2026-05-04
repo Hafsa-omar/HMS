@@ -124,7 +124,7 @@
 
     <div class="sidebar">
         <div class="logo" style="margin-bottom:30px; text-align:center;">
-            <img src="/assets/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+            <img src="/assets/HMS logo.jpeg" alt="HMS" style="width:150px; max-width:100%;">
         </div>
         <nav style="display:flex; flex-direction:column; gap:15px;">
             <a href="/admin" class="btn-nav dark"
@@ -162,7 +162,7 @@
 
     <div class="main-content">
 
-        <!-- Header -->
+        <!-- Header Banner -->
         <div style="background:linear-gradient(135deg,#dc3545,#a71d2a); border-radius:15px;
                     padding:25px 30px; color:white; margin-bottom:30px;
                     display:flex; align-items:center; gap:20px;">
@@ -180,34 +180,6 @@
             <div style="margin-left:auto; text-align:right;">
                 <p style="margin:0; opacity:0.8; font-size:0.85rem;">Today</p>
                 <p id="admin-date" style="margin:0; font-weight:700;"></p>
-            </div>
-        </div>
-
-        <!-- Stats Row -->
-        <div style="display:flex; gap:15px; margin-bottom:30px;">
-            <div class="stat-card">
-                <div class="num" id="stat-doctors" style="color:#007bff;">--</div>
-                <div class="label">
-                    <i class="fas fa-user-md" style="color:#007bff;"></i> Total Doctors
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="num" id="stat-patients" style="color:#28a745;">--</div>
-                <div class="label">
-                    <i class="fas fa-users" style="color:#28a745;"></i> Total Patients
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="num" id="stat-appointments" style="color:#6f42c1;">--</div>
-                <div class="label">
-                    <i class="fas fa-calendar-check" style="color:#6f42c1;"></i> Total Appointments
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="num" id="stat-cancelled" style="color:#dc3545;">--</div>
-                <div class="label">
-                    <i class="fas fa-times-circle" style="color:#dc3545;"></i> Cancelled
-                </div>
             </div>
         </div>
 
@@ -244,7 +216,7 @@
                     </span>
                 </div>
                 <input type="text" class="search-input"
-                       placeholder="🔍 Search doctors by name or specialty..."
+                       placeholder="Search doctors by name or specialty..."
                        oninput="searchDoctors(this.value)">
                 <div style="overflow-x:auto;">
                     <table class="admin-table">
@@ -256,7 +228,7 @@
                         </thead>
                         <tbody id="doctors-tbody">
                             <tr><td colspan="6" style="text-align:center; padding:30px; color:#666;">
-                                ⏳ Loading...
+                                Loading...
                             </td></tr>
                         </tbody>
                     </table>
@@ -280,7 +252,7 @@
                     </span>
                 </div>
                 <input type="text" class="search-input"
-                       placeholder="🔍 Search patients by name or email..."
+                       placeholder="Search patients by name or email..."
                        oninput="searchPatients(this.value)">
                 <div style="overflow-x:auto;">
                     <table class="admin-table">
@@ -292,7 +264,7 @@
                         </thead>
                         <tbody id="patients-tbody">
                             <tr><td colspan="6" style="text-align:center; padding:30px; color:#666;">
-                                ⏳ Loading...
+                                Loading...
                             </td></tr>
                         </tbody>
                     </table>
@@ -336,7 +308,7 @@
                         </thead>
                         <tbody id="appointments-tbody">
                             <tr><td colspan="7" style="text-align:center; padding:30px; color:#666;">
-                                ⏳ Loading...
+                                Loading...
                             </td></tr>
                         </tbody>
                     </table>
@@ -394,11 +366,11 @@
                             <i class="fas fa-info-circle" style="color:#007bff;"></i> Instructions
                         </h3>
                         <div style="font-size:0.85rem; color:#666; line-height:1.9;">
-                            <p>✅ All fields are required</p>
-                            <p>✅ Email must be unique</p>
-                            <p>✅ Doctor can login immediately</p>
-                            <p>✅ Password is set by admin</p>
-                            <p>✅ Specialty must match existing</p>
+                            <p>All fields are required</p>
+                            <p>Email must be unique</p>
+                            <p>Doctor can login immediately</p>
+                            <p>Password is set by admin</p>
+                            <p>Specialty must match existing</p>
                         </div>
                     </div>
                     <div style="background:#e7f1ff; border-radius:15px; padding:20px;">
@@ -459,24 +431,6 @@
             if (tab === 'patients')     loadPatients();
             if (tab === 'appointments') loadAppointments();
             if (tab === 'adddoctor')    loadSpecialties();
-        }
-
-        async function loadStats() {
-            try {
-                const [docRes, patRes, apptRes] = await Promise.all([
-                    fetch('/api/doctors'),
-                    fetch('/api/admin/patients'),
-                    fetch('/api/admin/appointments')
-                ]);
-                const docs  = await docRes.json();
-                const pats  = await patRes.json();
-                const appts = await apptRes.json();
-                document.getElementById('stat-doctors').innerText = docs.length;
-                document.getElementById('stat-patients').innerText = pats.length;
-                document.getElementById('stat-appointments').innerText = appts.length;
-                document.getElementById('stat-cancelled').innerText =
-                    appts.filter(a => a.status === 'CANCELLED').length;
-            } catch(e) { console.error(e); }
         }
 
         // DOCTORS
@@ -606,7 +560,7 @@
                         <td style="font-weight:600; font-size:0.9rem;">${a.pname}</td>
                         <td style="font-size:0.85rem; color:#007bff;">${a.docname}</td>
                         <td style="font-size:0.8rem; color:#555;">${a.sname || 'General'}</td>
-                        <td style="font-size:0.85rem;">📅 ${date}</td>
+                        <td style="font-size:0.85rem;">${date}</td>
                         <td><span class="badge ${badgeClass}">${a.status}</span></td>
                         <td>
                             ${a.status !== 'CANCELLED' && a.status !== 'COMPLETED' ? `
@@ -629,7 +583,7 @@
                 const res = await fetch(`/api/admin/appointments/cancel/${appoid}`,
                     { method: 'POST' });
                 const data = await res.json();
-                if (data.success) { loadAppointments(); loadStats(); }
+                if (data.success) { loadAppointments(); }
             } catch(e) { alert('Error cancelling appointment.'); }
         }
 
@@ -650,7 +604,6 @@
                 if (data.success) {
                     closeModal();
                     loadAppointments();
-                    loadStats();
                 }
             } catch(e) { alert('Error deleting appointment.'); }
         }
@@ -682,7 +635,7 @@
 
             if (!docname || !docemail || !docpassword || !doctel || !docnic || !specialties) {
                 msgDiv.innerHTML = `<p style="color:#dc3545; font-size:0.9rem;">
-                    ❌ All fields are required!</p>`;
+                    All fields are required!</p>`;
                 return;
             }
             try {
@@ -696,7 +649,7 @@
                     msgDiv.innerHTML = `
                         <div style="background:#e6f9ee; border:1px solid #28a745;
                                     padding:15px; border-radius:10px; color:#1a7a3c;">
-                            <p style="margin:0; font-weight:700;">✅ Doctor added successfully!</p>
+                            <p style="margin:0; font-weight:700;">Doctor added successfully!</p>
                             <p style="margin:5px 0 0; font-size:0.85rem;">
                                 Dr. ${docname} can now login with their credentials.
                             </p>
@@ -706,11 +659,10 @@
                         document.getElementById(id).value = '';
                     });
                     document.getElementById('new-specialty').selectedIndex = 0;
-                    loadStats();
                 } else {
-                    msgDiv.innerHTML = `<p style="color:#dc3545;">❌ Error: ${data.error}</p>`;
+                    msgDiv.innerHTML = `<p style="color:#dc3545;">Error: ${data.error}</p>`;
                 }
-            } catch(e) { msgDiv.innerHTML = `<p style="color:#dc3545;">❌ Server error.</p>`; }
+            } catch(e) { msgDiv.innerHTML = `<p style="color:#dc3545;">Server error.</p>`; }
         }
 
         // DELETE DOCTORS & PATIENTS
@@ -731,7 +683,7 @@
             try {
                 const res = await fetch(`/api/admin/doctors/delete/${docid}`, { method: 'POST' });
                 const data = await res.json();
-                if (data.success) { closeModal(); loadDoctors(); loadStats(); }
+                if (data.success) { closeModal(); loadDoctors(); }
             } catch(e) { alert('Error deleting doctor.'); }
         }
 
@@ -739,7 +691,7 @@
             try {
                 const res = await fetch(`/api/admin/patients/delete/${pid}`, { method: 'POST' });
                 const data = await res.json();
-                if (data.success) { closeModal(); loadPatients(); loadStats(); }
+                if (data.success) { closeModal(); loadPatients(); }
             } catch(e) { alert('Error deleting patient.'); }
         }
 
@@ -747,7 +699,6 @@
             document.getElementById('deleteModal').classList.remove('active');
         }
 
-        loadStats();
         loadDoctors();
     </script>
 </body>

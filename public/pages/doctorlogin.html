@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Doctor Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body.auth-page {
+            background-image: url('/assets/Doctor panel.peg.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        body.auth-page::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 0;
+        }
+        .nav-controls, .auth-card {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="auth-page">
+
+    <div class="nav-controls">
+        <button onclick="history.back()" class="btn-nav dark">
+            <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+        <a href="/" class="btn-nav dark">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </div>
+
+    <div class="auth-card">
+
+        <img src="/assets/HMS logo.jpeg" alt="HMS" style="width:180px; margin-bottom:10px;">
+        <h2>Doctor Staff Login</h2>
+        <span class="subtitle">Access the clinical management portal</span>
+
+        <form action="/auth/login" method="POST">
+
+            <div class="form-group">
+                <label><i class="fas fa-envelope" style="color:#007bff;"></i> Email Address:</label>
+                <input type="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-lock" style="color:#007bff;"></i> Password:</label>
+                <input type="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn-blue">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+
+            <p style="margin-top: 25px; font-size: 0.9rem; color: #666;">
+                Not a doctor?
+                <a href="/login" style="color: #007bff; text-decoration: none; font-weight: 600;">Patient Login</a>
+            </p>
+
+        </form>
+
+        <div style="margin-top:25px; padding:15px; background:#f8f9fa; border-radius:10px; text-align:left;">
+            <p style="font-size:0.8rem; font-weight:700; color:#666; margin-bottom:10px;">
+                Demo Doctor Account:
+            </p>
+            <p style="font-size:0.8rem; color:#888; margin:4px 0;">
+                Doctor: <b>ali.kara@hms.com</b> / <b>hms123</b>
+            </p>
+        </div>
+
+    </div>
+
+</body>
+</html>

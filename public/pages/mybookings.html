@@ -100,7 +100,7 @@
 
     <div class="sidebar">
         <div class="logo" style="margin-bottom:30px; text-align:center;">
-            <img src="/assets/logo.png" alt="HMS" style="width:150px; max-width:100%;">
+            <img src="/assets/HMS logo.jpeg" alt="HMS" style="width:150px; max-width:100%;">
         </div>
         <nav style="display:flex; flex-direction:column; gap:15px;">
             <a href="/dashboard" class="btn-nav dark" style="justify-content:flex-start;">
@@ -204,7 +204,7 @@
         <!-- Bookings List -->
         <div id="bookings-list">
             <div style="text-align:center; padding:60px; color:#666;">
-                ⏳ Loading your bookings...
+                Loading your bookings...
             </div>
         </div>
     </div>
@@ -212,12 +212,12 @@
     <div class="chat-btn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
     <div class="chat-window" id="chatWindow">
         <div class="chat-header">
-            <span>🏥 HMS AI Assistant</span>
+            <span>HMS AI Assistant</span>
             <i class="fas fa-times" onclick="toggleChat()" style="cursor:pointer;"></i>
         </div>
         <div class="chat-body" id="chatBody">
             <div class="msg bot-msg">
-                👋 Hello! I can see all your bookings and appointments. Ask me anything like <b>"Do I have any upcoming appointments?"</b> or <b>"What is my next appointment?"</b>
+                Hello! I can see all your bookings and appointments. Ask me anything like <b>"Do I have any upcoming appointments?"</b> or <b>"What is my next appointment?"</b>
             </div>
         </div>
         <div class="chat-footer">
@@ -249,7 +249,7 @@
                 renderBookings(allBookings);
             } catch(e) {
                 document.getElementById('bookings-list').innerHTML =
-                    '<p style="text-align:center; color:red; padding:40px;">❌ Error loading bookings.</p>';
+                    '<p style="text-align:center; color:red; padding:40px;">Error loading bookings.</p>';
             }
         }
 
@@ -316,10 +316,10 @@
                         <div style="flex:1;">
                             <h3 style="margin:0; font-size:1.05rem;">${a.docname}</h3>
                             <p style="margin:4px 0; color:#666; font-size:0.9rem;">
-                                🩺 ${a.sname || 'General Practice'}
+                                ${a.sname || 'General Practice'}
                             </p>
                             <p style="margin:4px 0; color:#888; font-size:0.85rem;">
-                                📅 ${date} &nbsp;|&nbsp;
+                                ${date} &nbsp;|&nbsp;
                                 🔖 Ref: <b>HMS-${String(a.appoid).padStart(4,'0')}</b>
                             </p>
                         </div>
@@ -347,7 +347,7 @@
                 const res = await fetch(`/api/appointments/cancel/${appoid}`, { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
-                    alert('✅ Appointment cancelled!');
+                    alert('Appointment cancelled.');
                     loadBookings();
                 }
             } catch(e) { alert('Error cancelling appointment.'); }
